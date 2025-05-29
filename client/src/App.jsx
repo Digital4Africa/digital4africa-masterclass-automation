@@ -105,6 +105,17 @@ function App() {
             AUTOMATION
           </h3>
         </div>
+        <div className="mb-12">
+          <div className="relative">
+            <div className="bg-gradient-to-r from-cyan-500 to-purple-500 p-1 rounded-full animate-pulse-glow">
+              <div className="bg-slate-900 px-8 py-3 rounded-full">
+                <span className="text-white text-lg font-semibold tracking-wide">
+                  FIRST PHASE LAUNCHING
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Countdown */}
         <div className="mb-12 w-full max-w-4xl">
@@ -140,17 +151,7 @@ function App() {
         </div>
 
         {/* Coming soon badge */}
-        <div className="mb-12">
-          <div className="relative">
-            <div className="bg-gradient-to-r from-cyan-500 to-purple-500 p-1 rounded-full animate-spin-slow">
-              <div className="bg-slate-900 px-8 py-3 rounded-full">
-                <span className="text-white text-lg font-semibold tracking-wide">
-                  FIRST PHASE LAUNCHING
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         {/* Simple call to action */}
         <div className="text-center max-w-md">
@@ -183,17 +184,23 @@ function App() {
           100% { transform: translate(60px, 60px); }
         }
 
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        @keyframes pulse-glow {
+          0%, 100% {
+            opacity: 0.6;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.3), 0 0 40px rgba(168, 85, 247, 0.2);
+          }
+          50% {
+            opacity: 1;
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.6), 0 0 60px rgba(168, 85, 247, 0.4);
+          }
         }
 
         .animate-gradient-x {
           animation: gradient-x 4s ease infinite;
         }
 
-        .animate-spin-slow {
-          animation: spin-slow 8s linear infinite;
+        .animate-pulse-glow {
+          animation: pulse-glow 2s ease-in-out infinite;
         }
       `}</style>
     </div>
