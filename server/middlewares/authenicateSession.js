@@ -4,6 +4,7 @@ import Admin from "../models/admin.model.js";
 
 export const authenticateSession = async (req, res, next) => {
   const { refreshToken } = req.cookies;
+ 
 
   if (!refreshToken) {
     return res.status(401).json({
@@ -14,7 +15,7 @@ export const authenticateSession = async (req, res, next) => {
 
   try {
     const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-    console.log(payload);
+
 
     if (payload.role !== "admin") {
       return res.status(403).json({
@@ -39,6 +40,7 @@ export const authenticateSession = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.log(error);
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(401).json({
         success: false,

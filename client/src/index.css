@@ -49,6 +49,28 @@
       transform: translateY(0);
     }
   }
+
+  @keyframes toastSlideIn {
+    from {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes toastSlideOut {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+  }
 }
 
 @layer components {
@@ -70,5 +92,10 @@
   /* Animation utility */
   .animate-fade-in {
     animation: fadeIn 0.5s ease-in-out;
+  }
+
+  /* Toast Animation */
+  .animate-toast-slide-in {
+    animation: toastSlideIn 0.3s ease-out forwards;
   }
 }

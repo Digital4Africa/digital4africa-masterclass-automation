@@ -3,23 +3,24 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 
+
 // Token generator
 const generateTokens = (admin) => {
 	const payload = { adminId: admin._id, role: "admin" };
 
 	const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
-		expiresIn: "2h",
+		expiresIn: "3m",
 	});
 
 	const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
-		expiresIn: "12h",
+		expiresIn: "36m",
 	});
 
 	return { accessToken, refreshToken };
 };
 
 const verifyPassword = async (inputPassword, hashedPassword) => {
-  return await bcrypt.compare(inputPassword, hashedPassword);
+	return await bcrypt.compare(inputPassword, hashedPassword);
 };
 
 
@@ -50,10 +51,10 @@ export const loginAdmin = async (req, res) => {
 
 	try {
 		const admin = await Admin.findOne({ email });
-		if (!admin) return res.status(400).json({ success: false, message: "Invalid credentials" });
+		if (!admin) return res.status(400).json({ success: false, message: "Access Denied" });
 
 		const isMatch = await verifyPassword(password, admin.password);
-		if (!isMatch) return res.status(400).json({ success: false, message: "Invalid credentials" });
+		if (!isMatch) return res.status(400).json({ success: false, message: "Access Denied" });
 
 		const { accessToken, refreshToken } = generateTokens(admin);
 
@@ -83,25 +84,23 @@ export const loginAdmin = async (req, res) => {
 // Refresh token
 export const refreshToken = async (req, res) => {
 	try {
-		const { refreshToken } = req.cookies;
-		if (!refreshToken) return res.status(401).json({ success: false, message: "Refresh token required" });
 
-		const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-		const admin = await Admin.findById(payload.adminId);
-		if (!admin) return res.status(401).json({ success: false, message: "Admin not found" });
+		const admin = req.admin
+		
+		if (!admin) {
+			return res.status(401).json({ success: false, message: "Admin not found" });
+		}
 
-		const { accessToken, refreshToken: newRefresh } = generateTokens(admin);
-
-		res.cookie("refreshToken", newRefresh, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "lax",
-			maxAge: 12 * 60 * 60 * 1000,
-		});
+		// Only generate new access token
+		const accessToken = jwt.sign(
+			{ adminId: admin._id },
+			process.env.JWT_SECRET,
+			{ expiresIn: "3m" } // Adjust expiry as needed
+		);
 
 		res.status(200).json({
 			success: true,
-			message: "Token refreshed",
+			message: "Access token refreshed",
 			admin: {
 				firstName: admin.firstName,
 				lastName: admin.lastName,

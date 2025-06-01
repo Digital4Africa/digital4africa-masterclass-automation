@@ -24,10 +24,7 @@ const masterclassSchema = new mongoose.Schema(
 			required: true,
 		},
 
-		isActive: {
-			type: Boolean,
-			default: true,
-		},
+	
 		heroImage: {
 			type: String,
 			required: false,

@@ -14,7 +14,7 @@ const router = express.Router();
 
 router.post("/register", registerAdmin);
 router.post("/login", loginAdmin);
-router.get("/refresh-token", refreshToken);
+router.get("/refresh-token", authenticateSession, refreshToken);
 router.post("/logout", logoutAdmin);
 
 router.delete("/delete", authenticateSession, deleteAdmin);
