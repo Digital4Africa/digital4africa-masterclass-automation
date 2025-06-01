@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 @layer base {
   *,
   *::before,
@@ -10,5 +11,64 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+  }
+
+  :root {
+    /* Digital4Africa Primary Colors */
+    --d4a-blue: #0060a1;
+    --d4a-red: #d20a11;
+    --d4a-black: #333333;
+
+    /* Gradients */
+    --d4a-gradient-blue: linear-gradient(135deg, #0060a1, #1887c3);
+    --d4a-gradient-red: linear-gradient(135deg, #9e0006, #d20a11);
+  }
+
+  body {
+    font-family: "Karla", sans-serif;
+    color: var(--d4a-black);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Quicksand", sans-serif;
+  }
+
+  /* Add the animation keyframes */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer components {
+  /* Primary Button - D4A Blue */
+  .btn-primary {
+    @apply bg-[var(--d4a-blue)] text-white px-6 py-2 rounded-lg hover:bg-[#005589] transition-colors cursor-pointer;
+  }
+
+  /* Secondary Button - D4A Red */
+  .btn-secondary {
+    @apply bg-[var(--d4a-red)] text-white px-6 py-2 rounded-lg hover:bg-[#b5090f] transition-colors cursor-pointer;
+  }
+
+  /* Input Field - Unified D4A Style */
+  .input-field {
+    @apply w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-[var(--d4a-blue)] focus:ring-1 focus:ring-[var(--d4a-blue)] outline-none;
+  }
+
+  /* Animation utility */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
   }
 }
