@@ -37,6 +37,7 @@ export const createMasterclass = async (req, res) => {
       const ext = path.extname(req.file.originalname); // e.g., '.jpg'
       const key = `masterclass-hero-images/${masterclass._id}${ext}`;
 
+
       const command = new PutObjectCommand({
         Bucket: process.env.R2_BUCKET,
         Key: key,
@@ -46,9 +47,7 @@ export const createMasterclass = async (req, res) => {
 
       await s3.send(command);
 
-      // Save image URL in DB
-      const imageUrl = `${process.env.R2_ENDPOINT}/${process.env.R2_BUCKET}/${key}`;
-      masterclass.heroImage = imageUrl;
+      masterclass.heroImage = `${process.env.R2_PUBLIC_URL}/${key}`;
       await masterclass.save();
     }
 
@@ -139,6 +138,7 @@ export const updateMasterclass = async (req, res) => {
       const ext = path.extname(req.file.originalname);
       const newKey = `masterclass-hero-images/${masterclass._id}${ext}`;
 
+
       const uploadCmd = new PutObjectCommand({
         Bucket: process.env.R2_BUCKET,
         Key: newKey,
@@ -147,7 +147,8 @@ export const updateMasterclass = async (req, res) => {
       });
 
       await s3.send(uploadCmd);
-      masterclass.heroImage = `${process.env.R2_ENDPOINT}/${process.env.R2_BUCKET}/${newKey}`;
+      masterclass.heroImage = `${process.env.R2_PUBLIC_URL}/${newKey}`;
+
     }
 
     // Update text fields
@@ -169,6 +170,22 @@ export const updateMasterclass = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
+    });
+  }
+};
+
+export const getAllMasterclasses = async (req, res) => {
+  try {
+    const masterclasses = await Masterclass.find().sort({ createdAt: -1 }); // newest first
+    res.status(200).json({
+      success: true,
+      data: masterclasses,
+    });
+  } catch (err) {
+    console.error("Get All Masterclasses Error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch masterclasses",
     });
   }
 };

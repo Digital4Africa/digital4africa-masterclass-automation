@@ -13,6 +13,8 @@ export const appRoutes = [
 	{ path: "/admin-home", component: AdminHomePage, requireAuth: true },
 	{ path: "/admin-home/masterclasses", component: AdminHomePage, requireAuth: true },
 	{ path: "/admin-home/students", component: AdminHomePage, requireAuth: true },
+	{ path: "/admin-home/masterclasses/new", component: AdminHomePage, requireAuth: true },
+	{ path: "/admin-home/masterclasses/:masterclassId/edit", component: AdminHomePage, requireAuth: true },
 
 
 	{path: "*", component: NotFound}

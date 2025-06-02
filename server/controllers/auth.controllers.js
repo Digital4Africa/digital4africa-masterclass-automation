@@ -9,11 +9,11 @@ const generateTokens = (admin) => {
 	const payload = { adminId: admin._id, role: "admin" };
 
 	const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
-		expiresIn: "3m",
+		expiresIn: "2h",
 	});
 
 	const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
-		expiresIn: "36m",
+		expiresIn: "12h",
 	});
 
 	return { accessToken, refreshToken };
@@ -86,7 +86,7 @@ export const refreshToken = async (req, res) => {
 	try {
 
 		const admin = req.admin
-		
+
 		if (!admin) {
 			return res.status(401).json({ success: false, message: "Admin not found" });
 		}
@@ -95,7 +95,7 @@ export const refreshToken = async (req, res) => {
 		const accessToken = jwt.sign(
 			{ adminId: admin._id },
 			process.env.JWT_SECRET,
-			{ expiresIn: "3m" } // Adjust expiry as needed
+			{ expiresIn: "2h" } // Adjust expiry as needed
 		);
 
 		res.status(200).json({

@@ -23,7 +23,7 @@ function App() {
     type: "",
   });
 
-  console.log("isAuthenticated: ", isAuthenticated);
+
 
   const showToast = (message, type) => {
     setToast({ isVisible: true, message, type });
@@ -60,7 +60,7 @@ function App() {
   } catch (error) {
     console.error("Token refresh error:", error);
 
-   
+
 
     return false;
   }
@@ -99,7 +99,7 @@ function App() {
         const decoded = jwtDecode(storedToken);
         const now = Math.floor(Date.now() / 1000);
         const timeUntilExpiry = decoded.exp - now;
-        console.log("timeUntilExpiry: ", timeUntilExpiry);
+        
 
         if (timeUntilExpiry <= 30 && timeUntilExpiry > 0) {
           if (!showSessionModal) {
@@ -143,8 +143,6 @@ function App() {
     if (storedToken) {
       try {
         const decoded = jwtDecode(storedToken);
-        console.log("decoded exp: ", decoded.exp);
-        console.log("current time: ", now);
 
         if (decoded.exp > now) {
           dispatch(setIsAuthenticated(true));

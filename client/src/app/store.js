@@ -3,6 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import authorizationReducer from '../features/auth/authSlice';
 
 import overlayReducer from '../features/overlay/overlaySlice'
+import allMasterClassesReducer from '../features/masterclass/fetchAllMasterclassesSlice'
 
 
 
@@ -11,7 +12,8 @@ const store = configureStore({
 
 		authorization: authorizationReducer,
 
-		overlay: overlayReducer
+		overlay: overlayReducer,
+		allMasterclasses: allMasterClassesReducer
 
 
 
