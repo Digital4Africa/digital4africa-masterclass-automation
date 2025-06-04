@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 const StatsCards = () => {
   const { allMasterclasses } = useSelector((state) => state.allMasterclasses);
-  
+
   const masterclasses = allMasterclasses || []
   const totalMasterclasses = masterclasses.length;
   const upcoming = masterclasses.filter(m => m.status === 'upcoming').length;
@@ -32,10 +32,10 @@ const StatsCards = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">{stat.title}</p>
-              <p className="text-2xl font-bold text-[var(--d4a-blue)]">{stat.value}</p>
+              <p className="text-l font-bold text-[var(--d4a-blue)]">{stat.value}</p>
               <p className="text-xs text-gray-400">{stat.change}</p>
             </div>
-            <span className="text-3xl">{stat.icon}</span>
+            <span className="text-l">{stat.icon}</span>
           </div>
         </div>
       ))}

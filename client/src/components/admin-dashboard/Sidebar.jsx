@@ -45,7 +45,7 @@ const Sidebar = ({ isOpen }) => {
 
   return (
     <>
-      <div className={`fixed inset-y-0 left-0 bg-white shadow-lg z-30 transition-all duration-300 ${isOpen ? 'w-64' : 'w-20'}`}>
+      <div className={`fixed inset-y-0 left-0 bg-white shadow-lg z-30 transition-all duration-300 ${isOpen ? 'w-54' : 'w-20'}`}>
         <div className="flex items-center justify-center h-16 bg-[var(--d4a-blue)] text-white">
           {isOpen ? (
             <h1 className="text-xl font-bold">D4A Admin</h1>

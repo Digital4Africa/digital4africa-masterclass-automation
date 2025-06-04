@@ -9,6 +9,7 @@ import { fetchMasterclasses } from '../features/masterclass/fetchAllMasterclasse
 import { useDispatch } from 'react-redux';
 import EditMasterclassForm from '../components/editMasterclass/EditMasterclassForm';
 import { useParams } from "react-router-dom";
+import { fetchCohorts } from '../features/cohorts/cohortsSlice';
 
 
 
@@ -42,6 +43,7 @@ const AdminPage = () => {
   }
   useEffect(() => {
     dispatch(fetchMasterclasses());
+    dispatch(fetchCohorts())
   }, [dispatch]);
 
   return <AdminLayout>{ContentComponent}</AdminLayout>;

@@ -1,10 +1,17 @@
+// DashboardHome.js
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MasterclassTable from "./MasterclassTable";
 import StatsCards from "./StatsCards";
 import CohortTable from "./CohortTable";
+import { useSelector } from "react-redux";
+import AddCohortModal from "./AddCohortModal";
+// import AddCohortModal from "./AddCohortModal";
 
 const DashboardHome = () => {
+  const { allMasterclasses } = useSelector((state) => state.allMasterclasses);
+  console.log(allMasterclasses);
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -18,11 +25,11 @@ const DashboardHome = () => {
       {/* Recent Cohorts */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-[var(--d4a-black)]">
+          <h2 className="text-l font-semibold text-[var(--d4a-black)]">
             Recent Cohorts
           </h2>
           <button
-            onClick={() => navigate("/admin-home/cohorts/new")}
+            onClick={() => setShowModal(true)}
             className="btn-primary text-sm px-4 py-2"
           >
             + New Cohort
@@ -30,6 +37,13 @@ const DashboardHome = () => {
         </div>
         <CohortTable />
       </div>
+
+      {showModal && (
+        <AddCohortModal
+          onClose={() => setShowModal(false)}
+          masterclasses={allMasterclasses}
+        />
+      )}
     </div>
   );
 };

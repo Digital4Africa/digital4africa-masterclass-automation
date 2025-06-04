@@ -12,7 +12,7 @@ const AdminLayout = ({ children }) => {
       <Sidebar isOpen={sidebarOpen} />
 
       {/* Content Area */}
-      <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-20'}`}>
+      <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${sidebarOpen ? 'ml-54' : 'ml-20'}`}>
         {/* Topbar */}
         <Topbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 

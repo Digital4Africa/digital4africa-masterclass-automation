@@ -3,9 +3,14 @@
 import mongoose from "mongoose";
 
 const cohortSchema = new mongoose.Schema({
-  masterclass: {
+  masterclassId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Masterclass',
+    required: true
+  },
+
+  masterclassTitle: {
+    type: String,
     required: true
   },
 
@@ -42,5 +47,5 @@ const cohortSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-
-module.exports = mongoose.model('Cohort', cohortSchema);
+const Cohort = mongoose.model('Cohort', cohortSchema)
+export default Cohort
