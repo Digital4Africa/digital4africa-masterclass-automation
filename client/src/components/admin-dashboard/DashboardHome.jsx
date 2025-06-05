@@ -1,17 +1,17 @@
 // DashboardHome.js
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+
 import StatsCards from "./StatsCards";
 import CohortTable from "./CohortTable";
 import { useSelector } from "react-redux";
 import AddCohortModal from "./AddCohortModal";
-// import AddCohortModal from "./AddCohortModal";
+
 
 const DashboardHome = () => {
   const { allMasterclasses } = useSelector((state) => state.allMasterclasses);
-  console.log(allMasterclasses);
-  const navigate = useNavigate();
+
   const [showModal, setShowModal] = useState(false);
+
 
   return (
     <div className="space-y-6">

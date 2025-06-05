@@ -52,16 +52,16 @@ const NotFoundPage = () => {
         >
           <button
             onClick={() => navigate(-1)}
-            className="btn-primary px-8 py-3 text-lg font-semibold"
+            className="btn-secondary px-8 py-3 text-lg font-semibold"
           >
             Go Back
           </button>
-          <button
+          {/* <button
             onClick={() => navigate('/')}
             className="btn-secondary px-8 py-3 text-lg font-semibold"
           >
             Return Home
-          </button>
+          </button> */}
         </motion.div>
 
         {/* Animated decorative elements */}

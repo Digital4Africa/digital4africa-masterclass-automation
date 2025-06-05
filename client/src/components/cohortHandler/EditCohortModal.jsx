@@ -2,10 +2,9 @@ import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { hideOverlay, showOverlay } from "../../features/overlay/overlaySlice";
 import Toast from "../Toast";
-import axios from "axios";
 import { fetchCohorts } from "../../features/cohorts/cohortsSlice";
 
-const AddCohortModal = ({ onClose, masterclasses }) => {
+const EditCohortModal = ({ onClose, masterclasses, cohort }) => {
   const dispatch = useDispatch();
   const [selectedMasterclass, setSelectedMasterclass] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -21,6 +20,17 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
     dispatch(showOverlay());
     return () => dispatch(hideOverlay());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (cohort) {
+		console.log(cohort);
+      const matching = masterclasses.find((m) => m.title === cohort.masterclassTitle
+);
+      setSelectedMasterclass(matching?._id || "");
+      setStartDate(cohort.startDate?.substring(0, 10) || "");
+      setEndDate(cohort.endDate?.substring(0, 10) || "");
+    }
+  }, [cohort, masterclasses]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,38 +57,23 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
     dispatch(showOverlay());
 
     try {
-      // Find the selected masterclass
-      const masterclass = masterclasses.find(
-        (m) => m._id === selectedMasterclass
-      );
-
-      await axios.post(
-        "http://localhost:3000/api/v1/cohort/create-cohort",
-        {
-          title: masterclass.title,
-          startDate,
-          endDate,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // simulate request
 
       setToast({
         isVisible: true,
-        message: "Cohort created successfully!",
+        message: "Cohort updated successfully!",
         type: "success",
       });
 
       setTimeout(() => {
         onClose();
         dispatch(hideOverlay());
-        dispatch(fetchCohorts())
+        dispatch(fetchCohorts());
       }, 1500);
     } catch (error) {
       setToast({
         isVisible: true,
-        message: error.response?.data?.message || "Error creating cohort",
+        message: "Error updating cohort",
         type: "error",
       });
       dispatch(hideOverlay());
@@ -97,7 +92,7 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold text-[var(--d4a-black)]">
-                Create New Cohort
+                Edit Cohort
               </h3>
               <button
                 onClick={onClose}
@@ -180,7 +175,7 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
                     isSubmitting ? "opacity-70 cursor-not-allowed" : ""
                   }`}
                 >
-                  {isSubmitting ? "Creating Cohort..." : "Create Cohort"}
+                  {isSubmitting ? "Updating..." : "Update Cohort"}
                 </button>
               </div>
             </form>
@@ -198,4 +193,4 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
   );
 };
 
-export default AddCohortModal;
+export default EditCohortModal;

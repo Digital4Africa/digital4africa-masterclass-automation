@@ -54,11 +54,20 @@ export const createCohort = async (req, res) => {
 export const getAllCohorts = async (req, res) => {
   try {
     const cohorts = await Cohort.find();
-    res.status(200).json(cohorts);
+    res.status(200).json({
+      success: true,
+      message: 'Cohorts fetched successfully',
+      data: cohorts,
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch cohorts' });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch cohorts',
+      error: error.message,
+    });
   }
 };
+
 export const deleteCohort = async (req, res) => {
   const { id } = req.params;
   try {

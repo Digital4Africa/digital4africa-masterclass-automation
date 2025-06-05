@@ -11,13 +11,15 @@ const Sidebar = ({ isOpen }) => {
   const dispatch = useDispatch()
 
   const navItems = [
-    { name: 'Dashboard', icon: '📊', path: '/admin-home' },
-    { name: 'Masterclasses', icon: '🎓', path: '/admin-home/masterclasses' },
-    { name: 'Students', icon: '👥', path: '/admin-home/students' },
-    { name: 'Payments', icon: '💳', path: '/admin-home/payments' },
-    { name: 'Communications', icon: '✉️', path: '/admin-home/communications' },
-    { name: 'Settings', icon: '⚙️', path: '/admin-home/settings' },
-  ];
+  { name: 'Dashboard', icon: '📊', path: '/admin-home' },
+  { name: 'Cohorts', icon: '🗂️', path: '/admin-home/cohorts' }, // ← Added here
+  { name: 'Masterclasses', icon: '🎓', path: '/admin-home/masterclasses' },
+  { name: 'Students', icon: '👥', path: '/admin-home/students' },
+  { name: 'Payments', icon: '💳', path: '/admin-home/payments' },
+  { name: 'Communications', icon: '✉️', path: '/admin-home/communications' },
+  { name: 'Settings', icon: '⚙️', path: '/admin-home/settings' },
+];
+
 
   const showToast = (message, type) => {
     setToast({ isVisible: true, message, type });

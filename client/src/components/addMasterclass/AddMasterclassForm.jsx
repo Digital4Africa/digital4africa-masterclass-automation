@@ -13,8 +13,7 @@ const AddMasterclassForm = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    startDate: "",
-    endDate: "",
+
     price: "",
     heroImage: null,
   });
@@ -63,8 +62,7 @@ const AddMasterclassForm = () => {
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
       formDataToSend.append("description", formData.description);
-      formDataToSend.append("startDate", formData.startDate);
-      formDataToSend.append("endDate", formData.endDate);
+      
       formDataToSend.append("price", formData.price);
       if (formData.heroImage) {
         formDataToSend.append("heroImage", formData.heroImage);

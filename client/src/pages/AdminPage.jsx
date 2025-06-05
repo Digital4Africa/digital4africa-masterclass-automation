@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import EditMasterclassForm from '../components/editMasterclass/EditMasterclassForm';
 import { useParams } from "react-router-dom";
 import { fetchCohorts } from '../features/cohorts/cohortsSlice';
+import CohortList from '../components/cohortHandler/CohortList';
 
 
 
@@ -27,6 +28,9 @@ const AdminPage = () => {
       break;
     case '/admin-home/masterclasses':
       ContentComponent = <MasterclassesList />;
+      break;
+    case '/admin-home/cohorts':
+      ContentComponent = <CohortList />;
       break;
     case '/admin-home/students':
       ContentComponent = <StudentsOverview/>;
