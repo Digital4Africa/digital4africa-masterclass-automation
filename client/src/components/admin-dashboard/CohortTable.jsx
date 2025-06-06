@@ -1,6 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 
 import { fetchCohorts } from "../../features/cohorts/cohortsSlice";
+import { formatDate } from "../../utils/formatDate";
 
 const CohortTable = () => {
   const dispatch = useDispatch();
@@ -12,7 +13,7 @@ const CohortTable = () => {
   // Filter and process cohorts
   const filteredCohorts = allCohorts
     .filter((cohort) => {
-      const start = new Date(cohort.startDate);
+      // const start = new Date(cohort.startDate);
       const end = new Date(cohort.endDate);
       return now <= end; // Only show cohorts that haven't ended yet
     })
@@ -24,10 +25,18 @@ const CohortTable = () => {
       const status = now >= start && now <= end ? "ongoing" : "upcoming";
 
       // Calculate total discounts
-      const totalDiscounts = cohort.discounts?.reduce((sum, discount) => sum + (discount.amount || 0), 0) || 0;
+      const totalDiscounts =
+        cohort.discounts?.reduce(
+          (sum, discount) => sum + (discount.amount || 0),
+          0
+        ) || 0;
 
       // Calculate total revenue from payments
-      const totalRevenue = cohort.payments?.reduce((sum, payment) => sum + (payment.amount || 0), 0) || 0;
+      const totalRevenue =
+        cohort.payments?.reduce(
+          (sum, payment) => sum + (payment.amount || 0),
+          0
+        ) || 0;
 
       // Calculate net revenue (total revenue - total discounts)
       const netRevenue = totalRevenue - totalDiscounts;
@@ -35,8 +44,8 @@ const CohortTable = () => {
       return {
         ...cohort, // Keep ALL original fields from DB
         status, // Only add status field
-        formattedStart: start.toLocaleDateString(),
-        formattedEnd: end.toLocaleDateString(),
+        formattedStart: formatDate(start),
+        formattedEnd: formatDate(end),
         totalDiscounts,
         netRevenue,
       };
@@ -118,8 +127,8 @@ const CohortTable = () => {
                   className="px-6 py-4 whitespace-nowrap font-medium text-[var(--d4a-blue)]"
                   title={cohort.masterclassTitle}
                 >
-                  {cohort.masterclassTitle.length > 25
-                    ? `${cohort.masterclassTitle.substring(0, 25)}...`
+                  {cohort.masterclassTitle.length > 23
+                    ? `${cohort.masterclassTitle.substring(0, 23)}...`
                     : cohort.masterclassTitle}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">

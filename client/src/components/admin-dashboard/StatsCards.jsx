@@ -84,7 +84,11 @@ const StatsCards = () => {
     },
     {
       title: "Total Discounts MTD",
-      value: loading ? <LoadingSpinner /> : `Kes ${totalDiscountsMTD.toLocaleString()}`,
+      value: loading ? (
+        <LoadingSpinner />
+      ) : (
+        `Kes ${totalDiscountsMTD.toLocaleString()}`
+      ),
     },
     {
       title: "Net Revenue MTD",
@@ -108,9 +112,9 @@ const StatsCards = () => {
               <p className="text-sm font-semibold text-[var(--d4a-black)]">
                 {stat.title}
               </p>
-              <p className="text-l font-bold text-[var(--d4a-blue)]">
+              <div className="text-l font-bold text-[var(--d4a-blue)]">
                 {stat.value}
-              </p>
+              </div>
             </div>
           </div>
         </div>
