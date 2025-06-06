@@ -23,11 +23,22 @@ const CohortTable = () => {
       // Determine status based on dates ONLY
       const status = now >= start && now <= end ? "ongoing" : "upcoming";
 
+      // Calculate total discounts
+      const totalDiscounts = cohort.discounts?.reduce((sum, discount) => sum + (discount.amount || 0), 0) || 0;
+
+      // Calculate total revenue from payments
+      const totalRevenue = cohort.payments?.reduce((sum, payment) => sum + (payment.amount || 0), 0) || 0;
+
+      // Calculate net revenue (total revenue - total discounts)
+      const netRevenue = totalRevenue - totalDiscounts;
+
       return {
         ...cohort, // Keep ALL original fields from DB
         status, // Only add status field
         formattedStart: start.toLocaleDateString(),
         formattedEnd: end.toLocaleDateString(),
+        totalDiscounts,
+        netRevenue,
       };
     });
 
@@ -89,6 +100,12 @@ const CohortTable = () => {
               Students
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Discounts
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Net Revenue
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Status
             </th>
           </tr>
@@ -101,8 +118,8 @@ const CohortTable = () => {
                   className="px-6 py-4 whitespace-nowrap font-medium text-[var(--d4a-blue)]"
                   title={cohort.masterclassTitle}
                 >
-                  {cohort.masterclassTitle.length > 40
-                    ? `${cohort.masterclassTitle.substring(0, 40)}...`
+                  {cohort.masterclassTitle.length > 25
+                    ? `${cohort.masterclassTitle.substring(0, 25)}...`
                     : cohort.masterclassTitle}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
@@ -113,6 +130,12 @@ const CohortTable = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {cohort.students?.length || 0}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  Ksh {cohort.totalDiscounts.toLocaleString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-medium">
+                  Ksh {cohort.netRevenue.toLocaleString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
@@ -128,7 +151,7 @@ const CohortTable = () => {
           ) : (
             <tr>
               <td
-                colSpan="5"
+                colSpan="7"
                 className="px-6 py-4 text-center text-sm text-gray-500"
               >
                 No ongoing or upcoming cohorts found

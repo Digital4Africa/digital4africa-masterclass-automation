@@ -1,25 +1,111 @@
 import { useSelector } from "react-redux";
 
-
 const StatsCards = () => {
   const { allMasterclasses } = useSelector((state) => state.allMasterclasses);
+  const { allCohorts, loading } = useSelector((state) => state.cohorts);
 
-  const masterclasses = allMasterclasses || []
+  const masterclasses = allMasterclasses || [];
+  const cohorts = allCohorts || [];
+
+  // Get current date and month boundaries
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
+  const monthStart = new Date(currentYear, currentMonth, 1);
+
+  // Calculate total masterclasses
   const totalMasterclasses = masterclasses.length;
-  const upcoming = masterclasses.filter(m => m.status === 'upcoming').length;
-  const ongoing = masterclasses.filter(m => m.status === 'ongoing').length;
-  // const completed = masterclasses.filter(m => m.status === 'completed').length;
 
-  const totalStudents = masterclasses.reduce((sum, m) => sum + (Number(m.enrolled) || 0), 0);
+  // Calculate upcoming and ongoing cohorts
+  const upcoming = cohorts.filter((cohort) => {
+    const startDate = new Date(cohort.startDate);
+    return currentDate < startDate;
+  }).length;
 
-  const totalRevenue = 45000;
+  const ongoing = cohorts.filter((cohort) => {
+    const startDate = new Date(cohort.startDate);
+    const endDate = new Date(cohort.endDate);
+    return currentDate >= startDate && currentDate <= endDate;
+  }).length;
+
+  // Calculate total students MTD (Month to Date)
+  const totalDiscountsMTD = cohorts.reduce((total, cohort) => {
+    if (cohort.discounts && cohort.discounts.length > 0) {
+      const discountsThisMonth = cohort.discounts.filter((discount) => {
+        const discountDate = new Date(discount.createdAt);
+        return discountDate >= monthStart && discountDate <= currentDate;
+      });
+      const cohortDiscount = discountsThisMonth.reduce(
+        (sum, discount) => sum + discount.amount,
+        0
+      );
+      return total + cohortDiscount;
+    }
+    return total;
+  }, 0);
+
+
+
+  // Calculate total revenue MTD (Month to Date)
+  const totalRevenueMTD = cohorts.reduce((total, cohort) => {
+    if (cohort.payments && cohort.payments.length > 0) {
+      const paymentsThisMonth = cohort.payments.filter((payment) => {
+        const paymentDate = new Date(payment.createdAt);
+        return paymentDate >= monthStart && paymentDate <= currentDate;
+      });
+      const cohortRevenue = paymentsThisMonth.reduce(
+        (sum, payment) => sum + payment.amount,
+        0
+      );
+      return total + cohortRevenue;
+    }
+    return total;
+  }, 0);
+
+  const netRevenueMTD = totalRevenueMTD - totalDiscountsMTD;
+
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className="inline-flex items-center">
+      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[var(--d4a-blue)]"></div>
+    </div>
+  );
 
   const stats = [
-    { title: 'Total Masterclasses', value: totalMasterclasses, change: '+2 from last month', icon: '🎓' },
-    { title: 'Upcoming', value: upcoming, change: '1 starts next week', icon: '⏳' },
-    { title: 'Ongoing', value: ongoing, change: '2 in progress', icon: '🚀' },
-    { title: 'Total Students MTD', value: totalStudents, change: '+12 from last month', icon: '👥' },
-    { title: 'Total Revenue MTD', value: `Kes ${totalRevenue}`, change: '+15% from last month', icon: '💰' },
+    {
+      title: "Total Masterclasses",
+      value: loading ? <LoadingSpinner /> : totalMasterclasses,
+      change: "+2 from last month",
+      icon: "🎓",
+    },
+    {
+      title: "Upcoming",
+      value: loading ? <LoadingSpinner /> : upcoming,
+      change: "1 starts next week",
+      icon: "⏳",
+    },
+    {
+      title: "Ongoing",
+      value: loading ? <LoadingSpinner /> : ongoing,
+      change: "2 in progress",
+      icon: "🚀",
+    },
+    {
+      title: "Total Discounts MTD",
+      value: loading ? <LoadingSpinner /> : `Kes ${totalDiscountsMTD.toLocaleString()}`,
+      change: "+12 from last month",
+      icon: "👥",
+    },
+    {
+      title: "Net Revenue MTD",
+      value: loading ? (
+        <LoadingSpinner />
+      ) : (
+        `Kes ${netRevenueMTD.toLocaleString()}`
+      ),
+      change: "+15% from last month",
+      icon: "💰",
+    },
   ];
 
   return (
@@ -31,9 +117,13 @@ const StatsCards = () => {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">{stat.title}</p>
-              <p className="text-l font-bold text-[var(--d4a-blue)]">{stat.value}</p>
-              <p className="text-xs text-gray-400">{stat.change}</p>
+              <p className="text-sm font-semibold text-gray-500">
+                {stat.title}
+              </p>
+              <p className="text-l font-bold text-[var(--d4a-blue)]">
+                {stat.value}
+              </p>
+              {/* <p className="text-xs text-gray-400">{stat.change}</p> */}
             </div>
             <span className="text-l">{stat.icon}</span>
           </div>
