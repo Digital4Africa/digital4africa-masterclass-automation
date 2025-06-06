@@ -105,7 +105,7 @@ const StatsCards = () => {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-gray-500">
+              <p className="text-sm font-semibold text-[var(--d4a-black)]">
                 {stat.title}
               </p>
               <p className="text-l font-bold text-[var(--d4a-blue)]">
