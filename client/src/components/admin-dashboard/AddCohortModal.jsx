@@ -4,6 +4,7 @@ import { hideOverlay, showOverlay } from "../../features/overlay/overlaySlice";
 import Toast from "../Toast";
 import axios from "axios";
 import { fetchCohorts } from "../../features/cohorts/cohortsSlice";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const AddCohortModal = ({ onClose, masterclasses }) => {
   const dispatch = useDispatch();
@@ -53,7 +54,7 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
       );
 
       await axios.post(
-        "http://localhost:3000/api/v1/cohort/create-cohort",
+        `${apiUrl}/api/v1/cohort/create-cohort`,
         {
           title: masterclass.title,
           startDate,

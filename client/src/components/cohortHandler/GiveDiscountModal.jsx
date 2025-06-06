@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { CheckCircle, AlertCircle, X } from "lucide-react";
 import { hideOverlay } from "../../features/overlay/overlaySlice";
-// import { showOverlay, hideOverlay } from "../path/to/your/overlaySlice"; // Update this path
-
+const apiUrl = import.meta.env.VITE_API_URL;
 const GiveDiscountModal = ({ cohort, onClose }) => {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
@@ -60,23 +59,20 @@ const GiveDiscountModal = ({ cohort, onClose }) => {
     setModalState("loading");
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/v1/cohort/give-discount",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            email: formData.email,
-            masterclassTitle: cohort.masterclassTitle,
-            cohortId: cohort._id,
-            amountOff: Number(formData.amountOff),
-            reason: formData.reason,
-          }),
-        }
-      );
+      const response = await fetch(`${apiUrl}/api/v1/cohort/give-discount`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email: formData.email,
+          masterclassTitle: cohort.masterclassTitle,
+          cohortId: cohort._id,
+          amountOff: Number(formData.amountOff),
+          reason: formData.reason,
+        }),
+      });
 
       const data = await response.json();
 
@@ -230,8 +226,11 @@ const GiveDiscountModal = ({ cohort, onClose }) => {
           <strong>{formData.email}</strong>
         </p>
         <p className="text-sm font-medium mb-6">
-          <strong className="bg-brown-100 px-2 py-1 rounded-md">Important!</strong> Please advice the student uses this
-          exact email when making payment for the discount to apply.
+          <strong className="bg-brown-100 px-2 py-1 rounded-md">
+            Important!
+          </strong>{" "}
+          Please advice the student uses this exact email when making payment
+          for the discount to apply.
         </p>
         <button
           onClick={handleClose}
