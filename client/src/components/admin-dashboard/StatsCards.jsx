@@ -28,7 +28,7 @@ const StatsCards = () => {
     return currentDate >= startDate && currentDate <= endDate;
   }).length;
 
-  // Calculate total students MTD (Month to Date)
+  // Calculate total discounts MTD
   const totalDiscountsMTD = cohorts.reduce((total, cohort) => {
     if (cohort.discounts && cohort.discounts.length > 0) {
       const discountsThisMonth = cohort.discounts.filter((discount) => {
@@ -44,9 +44,7 @@ const StatsCards = () => {
     return total;
   }, 0);
 
-
-
-  // Calculate total revenue MTD (Month to Date)
+  // Calculate total revenue MTD
   const totalRevenueMTD = cohorts.reduce((total, cohort) => {
     if (cohort.payments && cohort.payments.length > 0) {
       const paymentsThisMonth = cohort.payments.filter((payment) => {
@@ -75,26 +73,18 @@ const StatsCards = () => {
     {
       title: "Total Masterclasses",
       value: loading ? <LoadingSpinner /> : totalMasterclasses,
-      change: "+2 from last month",
-      icon: "🎓",
     },
     {
       title: "Upcoming",
       value: loading ? <LoadingSpinner /> : upcoming,
-      change: "1 starts next week",
-      icon: "⏳",
     },
     {
       title: "Ongoing",
       value: loading ? <LoadingSpinner /> : ongoing,
-      change: "2 in progress",
-      icon: "🚀",
     },
     {
       title: "Total Discounts MTD",
       value: loading ? <LoadingSpinner /> : `Kes ${totalDiscountsMTD.toLocaleString()}`,
-      change: "+12 from last month",
-      icon: "👥",
     },
     {
       title: "Net Revenue MTD",
@@ -103,8 +93,6 @@ const StatsCards = () => {
       ) : (
         `Kes ${netRevenueMTD.toLocaleString()}`
       ),
-      change: "+15% from last month",
-      icon: "💰",
     },
   ];
 
@@ -123,9 +111,7 @@ const StatsCards = () => {
               <p className="text-l font-bold text-[var(--d4a-blue)]">
                 {stat.value}
               </p>
-              {/* <p className="text-xs text-gray-400">{stat.change}</p> */}
             </div>
-            <span className="text-l">{stat.icon}</span>
           </div>
         </div>
       ))}
