@@ -11,33 +11,18 @@ const masterclassSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
-		startDate: {
-			type: Date,
-			required: true,
-		},
-		endDate: {
-			type: Date,
-			required: true,
-		},
+		
 		price: {
 			type: Number,
 			required: true,
 		},
 
-	
+
 		heroImage: {
 			type: String,
 			required: false,
 		},
-		startDate: {
-			type: Date,
-			required: true,
-		},
 
-		endDate: {
-			type: Date,
-			required: true,
-		},
 
 
 	},

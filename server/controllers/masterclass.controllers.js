@@ -18,13 +18,12 @@ const s3 = new S3Client({
 export const createMasterclass = async (req, res) => {
   try {
     // Step 1: Create masterclass without isActive and without image first
-    const { title, description, startDate, endDate, price } = req.body;
+    const { title, description,  price } = req.body;
 
     const masterclass = new Masterclass({
       title,
       description,
-      startDate,
-      endDate,
+
       price,
 
     });
@@ -111,7 +110,7 @@ export const deleteMasterclass = async (req, res) => {
 export const updateMasterclass = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, startDate, endDate, price } = req.body;
+    const { title, description,  price } = req.body;
 
     const masterclass = await Masterclass.findById(id);
     if (!masterclass) {
@@ -154,8 +153,7 @@ export const updateMasterclass = async (req, res) => {
     // Update text fields
     masterclass.title = title || masterclass.title;
     masterclass.description = description || masterclass.description;
-    masterclass.startDate = startDate || masterclass.startDate;
-    masterclass.endDate = endDate || masterclass.endDate;
+
     masterclass.price = price || masterclass.price;
 
     await masterclass.save();

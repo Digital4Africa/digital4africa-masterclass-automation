@@ -8,7 +8,13 @@ const discountSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    masterclass: {
+    cohortId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Cohort",
+      required: true,
+    },
+
+    masterclassId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Masterclass",
       required: true,

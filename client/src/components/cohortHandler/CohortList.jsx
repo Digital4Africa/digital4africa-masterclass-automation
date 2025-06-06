@@ -1,5 +1,5 @@
 import { useState } from "react";
-import CohortCard from "./CohortCard"; // your card
+import CohortCard from "./CohortCard";
 import { useSelector } from "react-redux";
 
 const CohortList = () => {
@@ -60,34 +60,46 @@ const CohortList = () => {
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           Ongoing Cohorts
         </h2>
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {inprogress.map((cohort) => (
-            <CohortCard
-              key={cohort._id}
-              cohort={cohort}
-              onCopyLink={copyCheckoutLink}
-              toast={toast}
-              closeToast={closeToast}
-            />
-          ))}
-        </div>
+        {inprogress.length > 0 ? (
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {inprogress.map((cohort) => (
+              <CohortCard
+                key={cohort._id}
+                cohort={cohort}
+                onCopyLink={copyCheckoutLink}
+                toast={toast}
+                closeToast={closeToast}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 italic py-2">
+            No ongoing cohorts at this time
+          </p>
+        )}
       </div>
 
       <div>
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           Upcoming Cohorts
         </h2>
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {upcoming.map((cohort) => (
-            <CohortCard
-              key={cohort._id}
-              cohort={cohort}
-              onCopyLink={copyCheckoutLink}
-              toast={toast}
-              closeToast={closeToast}
-            />
-          ))}
-        </div>
+        {upcoming.length > 0 ? (
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {upcoming.map((cohort) => (
+              <CohortCard
+                key={cohort._id}
+                cohort={cohort}
+                onCopyLink={copyCheckoutLink}
+                toast={toast}
+                closeToast={closeToast}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 italic py-2">
+            No upcoming cohorts scheduled
+          </p>
+        )}
       </div>
 
       {/* Table Section: Ended */}

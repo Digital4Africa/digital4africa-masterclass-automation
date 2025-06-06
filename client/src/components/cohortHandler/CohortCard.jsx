@@ -1,14 +1,19 @@
 // import { useNavigate } from "react-router-dom";
 import { Edit3, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import EditCohortModal from "./EditCohortModal";
+import GiveDiscountModal from "./GiveDiscountModal";
 import Toast from "../Toast";
+import { hideOverlay, showOverlay } from "../../features/overlay/overlaySlice";
+// import { showOverlay, hideOverlay } from "../path/to/your/overlaySlice"; // Update this path
 
 const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
   console.log(toast);
   const [showModal, setShowModal] = useState(false);
+  const [showDiscountModal, setShowDiscountModal] = useState(false);
   const { allMasterclasses } = useSelector((state) => state.allMasterclasses);
+  const dispatch = useDispatch();
 
   // const navigate = useNavigate();
   const currentDate = new Date();
@@ -55,6 +60,16 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
         color: "bg-gray-100 text-gray-800",
       };
     }
+  };
+
+  const handleGiveDiscount = () => {
+    dispatch(showOverlay());
+    setShowDiscountModal(true);
+  };
+
+  const handleCloseDiscountModal = () => {
+    dispatch(hideOverlay());
+    setShowDiscountModal(false);
   };
 
   const statusInfo = getStatus();
@@ -138,6 +153,7 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
             Copy Link
           </button>
           <button
+            onClick={handleGiveDiscount}
             className={`flex-1 text-sm px-4 py-2 rounded-lg transition-colors ${
               isDisabled
                 ? "bg-gray-200 text-gray-500 cursor-not-allowed"
@@ -165,6 +181,12 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
           onClose={() => setShowModal(false)}
           masterclasses={allMasterclasses}
           cohort={cohort}
+        />
+      )}
+      {showDiscountModal && (
+        <GiveDiscountModal
+          cohort={cohort}
+          onClose={handleCloseDiscountModal}
         />
       )}
     </div>

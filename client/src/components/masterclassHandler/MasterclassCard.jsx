@@ -1,8 +1,64 @@
 import { useNavigate } from "react-router-dom";
 import { Edit3, Trash2 } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { useState } from "react";
+import { hideOverlay, showOverlay } from "../../features/overlay/overlaySlice";
+import axios from "axios";
+import { fetchMasterclasses } from "../../features/masterclass/fetchAllMasterclassesSlice";
+import Toast from "../Toast";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const MasterclassCard = ({ masterclass }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [toast, setToast] = useState({
+    isVisible: false,
+    message: "",
+    type: "",
+  });
+  const closeToast = () => {
+    setToast((prev) => ({ ...prev, isVisible: false }));
+  };
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      dispatch(showOverlay());
+
+      const response = await axios.delete(
+        `${apiUrl}/api/v1/masterclass/remove-masterclass/${masterclass._id}`,
+        { withCredentials: true }
+      );
+
+      setToast({
+        isVisible: true,
+        message: response.data?.message || "Masterclass deleted successfully!",
+        type: response.data?.success ? "success" : "error",
+      });
+
+      if (response.data?.success) {
+        setTimeout(() => {
+          navigate("/admin-home/masterclasses");
+          dispatch(fetchMasterclasses());
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Error deleting masterclass:", error);
+      setToast({
+        isVisible: true,
+        message:
+          error.response?.data?.message || "Failed to delete masterclass",
+        type: "error",
+      });
+    } finally {
+      setIsDeleting(false);
+      dispatch(hideOverlay());
+      setShowDeleteModal(false);
+    }
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200 h-full flex flex-col">
@@ -16,13 +72,16 @@ const MasterclassCard = ({ masterclass }) => {
           {/* Floating Action Icons */}
           <div className="absolute top-3 right-3 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             <button
-              onClick={() => navigate(`/admin-home/masterclasses/${masterclass._id}/edit`)}
+              onClick={() =>
+                navigate(`/admin-home/masterclasses/${masterclass._id}/edit`)
+              }
               className="bg-white/90 backdrop-blur-sm hover:bg-white p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
               title="Edit masterclass"
             >
               <Edit3 size={16} className="text-gray-700 hover:text-blue-600" />
             </button>
             <button
+              onClick={() => setShowDeleteModal(true)}
               className="bg-white/90 backdrop-blur-sm hover:bg-white p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
               title="Delete masterclass"
             >
@@ -63,6 +122,21 @@ const MasterclassCard = ({ masterclass }) => {
           Ksh {masterclass.price}
         </div>
       </div>
+
+      <Toast
+        isVisible={toast.isVisible}
+        message={toast.message}
+        type={toast.type}
+        onClose={closeToast}
+      />
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        title="Delete Masterclass"
+        description="Are you sure you want to delete this masterclass? This action cannot be undone."
+        isLoading={isDeleting}
+      />
     </div>
   );
 };

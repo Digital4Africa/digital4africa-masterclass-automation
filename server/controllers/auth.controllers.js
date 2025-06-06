@@ -9,11 +9,11 @@ const generateTokens = (admin) => {
 	const payload = { adminId: admin._id, role: "admin" };
 
 	const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
-		expiresIn: "2m",
+		expiresIn: "40m",
 	});
 
 	const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
-		expiresIn: "20m",
+		expiresIn: "1h",
 	});
 
 	return { accessToken, refreshToken };
@@ -95,7 +95,7 @@ export const refreshToken = async (req, res) => {
 		const accessToken = jwt.sign(
 			{ adminId: admin._id },
 			process.env.JWT_SECRET,
-			{ expiresIn: "2m" } // Adjust expiry as needed
+			{ expiresIn: "40m" } // Adjust expiry as needed
 		);
 
 		res.status(200).json({

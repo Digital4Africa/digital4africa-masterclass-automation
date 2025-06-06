@@ -9,15 +9,14 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 const EditMasterclassForm = () => {
   const { allMasterclasses } = useSelector((state) => state.allMasterclasses);
-  console.log(allMasterclasses);
+  // console.log(allMasterclasses);
   const navigate = useNavigate();
   const dispatch = useDispatch()
   const { masterclassId } = useParams();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    startDate: "",
-    endDate: "",
+
     price: "",
     heroImage: null,
   });
@@ -37,17 +36,12 @@ const EditMasterclassForm = () => {
       );
 
       if (masterclassToEdit) {
-        // Format dates for datetime-local input
-        const formatDateForInput = (dateString) => {
-          const date = new Date(dateString);
-          return date.toISOString().slice(0, 16);
-        };
+
 
         setFormData({
           title: masterclassToEdit.title || "",
           description: masterclassToEdit.description || "",
-          startDate: formatDateForInput(masterclassToEdit.startDate),
-          endDate: formatDateForInput(masterclassToEdit.endDate),
+
           price: masterclassToEdit.price.toString() || "",
           heroImage: null, // Keep as null since we can't prefill file input
         });
@@ -82,29 +76,20 @@ const EditMasterclassForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    if (!formData.heroImage) {
-      setToast({
-        isVisible: true,
-        message: "Please upload a hero image before submitting.",
-        type: "error",
-      });
-      setIsSubmitting(false);
-      return;
-    }
+
 
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
       formDataToSend.append("description", formData.description);
-      formDataToSend.append("startDate", formData.startDate);
-      formDataToSend.append("endDate", formData.endDate);
+
       formDataToSend.append("price", formData.price);
       if (formData.heroImage) {
         formDataToSend.append("heroImage", formData.heroImage);
       }
 
-      const response = await axios.post(
-        `${apiUrl}/api/v1/masterclass/add-masterclass`,
+      const response = await axios.put(
+        `${apiUrl}/api/v1/masterclass/update-masterclass/${masterclassId}`,
         formDataToSend,
         {
           withCredentials: true,

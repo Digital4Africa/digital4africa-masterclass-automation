@@ -13,6 +13,20 @@ const cohortSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  masterclassDescription: {
+    type: String,
+    required: true
+  },
+
+  masterclassHeroImg: {
+    type: String,
+    required: true
+  },
+
+  masterclassPrice: {
+    type: Number,
+    required: true
+  },
 
   startDate: {
     type: Date,
