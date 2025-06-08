@@ -4,6 +4,7 @@ import authorizationReducer from "../features/auth/authSlice";
 import overlayReducer from "../features/overlay/overlaySlice";
 import allMasterClassesReducer from "../features/masterclass/fetchAllMasterclassesSlice";
 import allCohortsReducer from "../features/cohorts/cohortsSlice";
+import studentsCohortReducer from "../features/cohorts/cohortsSliceStudentsDetails"
 
 const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ const store = configureStore({
     overlay: overlayReducer,
     allMasterclasses: allMasterClassesReducer,
     cohorts: allCohortsReducer,
+    studentsCohorts: studentsCohortReducer
   },
 });
 

@@ -4,11 +4,13 @@ import LandingPage from "./pages/Landing"
 const LoginPage = lazy(()=>import("./pages/LoginPage"))
 const AdminHomePage = lazy(() =>import("./pages/AdminPage"))
 const NotFound = lazy(() => import("./pages/NotFoundPage"))
+const CheckoutPage = lazy(() => import("./pages/CheckoutPage"))
 
 
 
 export const appRoutes = [
 	{ path: "/", component: LandingPage },
+	{ path: "/checkout/:cohortId", component: CheckoutPage },
 	{ path: "/admin-067", component: LoginPage },
 	{ path: "/admin-home", component: AdminHomePage, requireAuth: true },
 	{ path: "/admin-home/masterclasses", component: AdminHomePage, requireAuth: true },

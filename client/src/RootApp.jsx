@@ -1,12 +1,10 @@
 import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
 import store from './app/store.js';
 import Overlay from './components/Overlay.jsx';
 
-
 const InnerApp = () => {
- 
-
   return (
     <>
       <Overlay />
@@ -17,7 +15,9 @@ const InnerApp = () => {
 
 const RootApp = () => (
   <Provider store={store}>
-    <InnerApp />
+    <BrowserRouter>
+      <InnerApp />
+    </BrowserRouter>
   </Provider>
 );
 

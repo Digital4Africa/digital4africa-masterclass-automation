@@ -8,7 +8,7 @@ const CohortTable = () => {
   const now = new Date();
   const cohortsState = useSelector((state) => state.cohorts);
   const { allCohorts, loading, error } = cohortsState;
-  console.log(allCohorts);
+  
 
   // Filter and process cohorts
   const filteredCohorts = allCohorts

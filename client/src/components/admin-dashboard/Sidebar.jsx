@@ -1,53 +1,61 @@
-import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import Toast from '../Toast'; // Adjust path as needed
-import { logoutAdmin } from '../../utils/logoutAdmin';
-import { useDispatch } from 'react-redux';
-
+import React, { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import Toast from "../Toast"; // Adjust path as needed
+import { logoutAdmin } from "../../utils/logoutAdmin";
+import { useDispatch } from "react-redux";
+import { setIsAuthenticated, unsetUser } from "../../features/auth/authSlice";
 
 const Sidebar = ({ isOpen }) => {
-  const [toast, setToast] = useState({ isVisible: false, message: '', type: '' });
+  const [toast, setToast] = useState({
+    isVisible: false,
+    message: "",
+    type: "",
+  });
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const navItems = [
-  { name: 'Dashboard', icon: '📊', path: '/admin-home' },
-  { name: 'Cohorts', icon: '🗂️', path: '/admin-home/cohorts' }, // ← Added here
-  { name: 'Masterclasses', icon: '🎓', path: '/admin-home/masterclasses' },
-  { name: 'Students', icon: '👥', path: '/admin-home/students' },
-  { name: 'Payments', icon: '💳', path: '/admin-home/payments' },
-  { name: 'Communications', icon: '✉️', path: '/admin-home/communications' },
-  { name: 'Settings', icon: '⚙️', path: '/admin-home/settings' },
-];
-
+    { name: "Dashboard", icon: "📊", path: "/admin-home" },
+    { name: "Cohorts", icon: "🗂️", path: "/admin-home/cohorts" }, // ← Added here
+    { name: "Masterclasses", icon: "🎓", path: "/admin-home/masterclasses" },
+    { name: "Students", icon: "👥", path: "/admin-home/students" },
+    { name: "Payments", icon: "💳", path: "/admin-home/payments" },
+    { name: "Communications", icon: "✉️", path: "/admin-home/communications" },
+    { name: "Settings", icon: "⚙️", path: "/admin-home/settings" },
+  ];
 
   const showToast = (message, type) => {
     setToast({ isVisible: true, message, type });
   };
 
   const hideToast = () => {
-    setToast({ isVisible: false, message: '', type: '' });
+    setToast({ isVisible: false, message: "", type: "" });
   };
 
   const handleLogout = async () => {
-  const success = await logoutAdmin(dispatch);
+    const success = await logoutAdmin(dispatch);
 
-  if (success) {
-    showToast('Logged out successfully!', 'success');
+    if (success) {
+      showToast("Logged out successfully!", "success");
 
-    // Wait for toast to show before navigating
-    setTimeout(() => {
-      navigate("/admin-067");
-    }, 1500); // 1.5s delay (adjust to match your Toast duration)
-  } else {
-    showToast('Logout failed. Please try again.', 'error');
-  }
-};
-
+      // Wait for toast to show before navigating
+      setTimeout(() => {
+        dispatch(setIsAuthenticated(false));
+        navigate("/admin-067", { replace: true });
+        dispatch(unsetUser());
+      }, 1500); // 1.5s delay (adjust to match your Toast duration)
+    } else {
+      showToast("Logout failed. Please try again.", "error");
+    }
+  };
 
   return (
     <>
-      <div className={`fixed inset-y-0 left-0 bg-white shadow-lg z-30 transition-all duration-300 ${isOpen ? 'w-54' : 'w-20'}`}>
+      <div
+        className={`fixed inset-y-0 left-0 bg-white shadow-lg z-30 transition-all duration-300 ${
+          isOpen ? "w-54" : "w-20"
+        }`}
+      >
         <div className="flex items-center justify-center h-16 bg-[var(--d4a-blue)] text-white">
           {isOpen ? (
             <h1 className="text-xl font-bold">D4A Admin</h1>
@@ -60,10 +68,14 @@ const Sidebar = ({ isOpen }) => {
             <NavLink
               key={item.name}
               to={item.path}
-              end={item.path === '/admin-home'}
+              end={item.path === "/admin-home"}
               className={({ isActive }) =>
                 `flex items-center px-4 py-3 mx-2 rounded-lg transition-colors duration-200
-                ${isActive ? 'bg-[var(--d4a-blue)] text-white' : 'text-gray-600 hover:bg-gray-100'}`
+                ${
+                  isActive
+                    ? "bg-[var(--d4a-blue)] text-white"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`
               }
             >
               <span className="text-xl">{item.icon}</span>

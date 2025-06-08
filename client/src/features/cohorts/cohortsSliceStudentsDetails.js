@@ -4,12 +4,12 @@ import axios from 'axios';
 const apiUrl = import.meta.env.VITE_API_URL;
 
 // Async thunk to fetch all cohorts
-export const fetchCohorts = createAsyncThunk(
-  'cohorts/fetchAll', // match this with the name below
+export const fetchStudentsCohorts = createAsyncThunk(
+  'studentsCohorts/fetchAll', // match this with the name below
   async (_, thunkAPI) => {
     try {
-      const response = await axios.get(`${apiUrl}/api/v1/cohort/all-cohorts`, {
-        withCredentials: true,
+      const response = await axios.get(`${apiUrl}/api/v1/cohort/students-cohorts`, {
+
       });
       return response.data.data; // This should be an array of cohorts
     } catch (error) {
@@ -23,26 +23,26 @@ export const fetchCohorts = createAsyncThunk(
 
 // Create the slice
 const cohortsSlice = createSlice({
-  name: 'cohorts', // 🔁 This should match the store key and the async thunk prefix
+  name: 'studentsCohorts',
   initialState: {
-    allCohorts: [],
+    studentsCohorts: [],
     loading: false,
     error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchCohorts.pending, (state) => {
+      .addCase(fetchStudentsCohorts.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchCohorts.fulfilled, (state, action) => {
+      .addCase(fetchStudentsCohorts.fulfilled, (state, action) => {
         state.loading = false;
         
-        state.allCohorts = action.payload;
+        state.studentsCohorts = action.payload;
       })
 
-      .addCase(fetchCohorts.rejected, (state, action) => {
+      .addCase(fetchStudentsCohorts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -3,6 +3,8 @@ import { useDispatch } from "react-redux";
 import { hideOverlay, showOverlay } from "../../features/overlay/overlaySlice";
 import Toast from "../Toast";
 import { fetchCohorts } from "../../features/cohorts/cohortsSlice";
+import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const EditCohortModal = ({ onClose, masterclasses, cohort }) => {
   const dispatch = useDispatch();
@@ -33,54 +35,69 @@ const EditCohortModal = ({ onClose, masterclasses, cohort }) => {
   }, [cohort, masterclasses]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!selectedMasterclass || !startDate || !endDate) {
-      setToast({
-        isVisible: true,
-        message: "Please fill all fields",
-        type: "error",
-      });
-      return;
-    }
+  if (!selectedMasterclass || !startDate || !endDate) {
+    setToast({
+      isVisible: true,
+      message: "Please fill all fields",
+      type: "error",
+    });
+    return;
+  }
 
-    if (new Date(startDate) > new Date(endDate)) {
-      setToast({
-        isVisible: true,
-        message: "End date must be after start date",
-        type: "error",
-      });
-      return;
-    }
+  if (new Date(startDate) > new Date(endDate)) {
+    setToast({
+      isVisible: true,
+      message: "End date must be after start date",
+      type: "error",
+    });
+    return;
+  }
 
-    setIsSubmitting(true);
-    dispatch(showOverlay());
+  setIsSubmitting(true);
+  dispatch(showOverlay());
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // simulate request
-
-      setToast({
-        isVisible: true,
-        message: "Cohort updated successfully!",
-        type: "success",
-      });
-
-      setTimeout(() => {
-        onClose();
-        dispatch(hideOverlay());
-        dispatch(fetchCohorts());
-      }, 1500);
-    } catch (error) {
-      setToast({
-        isVisible: true,
-        message: "Error updating cohort",
-        type: "error",
-      });
-      dispatch(hideOverlay());
-    } finally {
-      setIsSubmitting(false);
-    }
+  const formDataToSend = {
+    cohortId: cohort._id,
+    masterclassId: selectedMasterclass,
+    startDate,
+    endDate,
   };
+
+  try {
+    await axios.put(
+      `${apiUrl}/api/v1/cohort/update`,
+      formDataToSend,
+      {
+        withCredentials: true,
+      }
+    );
+
+    setToast({
+      isVisible: true,
+      message: "Cohort updated successfully!",
+      type: "success",
+    });
+
+    setTimeout(() => {
+      onClose();
+      dispatch(hideOverlay());
+      dispatch(fetchCohorts());
+    }, 1500);
+  } catch (error) {
+    console.error(error);
+    setToast({
+      isVisible: true,
+      message: "Error updating cohort",
+      type: "error",
+    });
+
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   return (
     <>

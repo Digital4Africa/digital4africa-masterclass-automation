@@ -9,7 +9,7 @@ import { hideOverlay, showOverlay } from "../../features/overlay/overlaySlice";
 // import { showOverlay, hideOverlay } from "../path/to/your/overlaySlice"; // Update this path
 
 const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
-  console.log(toast);
+  
   const [showModal, setShowModal] = useState(false);
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const { allMasterclasses } = useSelector((state) => state.allMasterclasses);

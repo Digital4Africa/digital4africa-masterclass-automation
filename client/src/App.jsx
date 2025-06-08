@@ -1,5 +1,11 @@
 import { Suspense, useEffect, useState } from "react";
-import { Route, Routes, BrowserRouter } from "react-router-dom";
+import {
+  Route,
+  Routes,
+  BrowserRouter,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { appRoutes } from "./appRoutes";
@@ -7,7 +13,8 @@ import { hideOverlay, showOverlay } from "./features/overlay/overlaySlice";
 import { setIsAuthenticated, unsetUser } from "./features/auth/authSlice";
 import Toast from "./components/Toast";
 import axios from "axios";
-import { Navigate } from 'react-router-dom';
+import { Navigate } from "react-router-dom";
+import { fetchStudentsCohorts } from "./features/cohorts/cohortsSliceStudentsDetails";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function App() {
@@ -17,13 +24,13 @@ function App() {
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [countdown, setCountdown] = useState(30);
   const [sessionExpired, setSessionExpired] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
   const [toast, setToast] = useState({
     isVisible: false,
     message: "",
     type: "",
   });
-
-
 
   const showToast = (message, type) => {
     setToast({ isVisible: true, message, type });
@@ -34,37 +41,32 @@ function App() {
   };
 
   const refreshAccessToken = async () => {
-  try {
-    const response = await axios.get(
-      `${apiUrl}/api/v1/auth/refresh-token`,
-      {
-        withCredentials: true
+    try {
+      const response = await axios.get(`${apiUrl}/api/v1/auth/refresh-token`, {
+        withCredentials: true,
+      });
+
+      if (response.data.success) {
+        const { accessToken, admin } = response.data;
+
+        // Store the new access token
+        localStorage.setItem("Tr9kLmXzQ", accessToken);
+
+        // Update admin data if provided
+        if (admin) {
+          localStorage.setItem("d4aAdmin", JSON.stringify(admin));
+        }
+
+        return true;
       }
-    );
 
-    if (response.data.success) {
-      const { accessToken, admin } = response.data;
+      return false;
+    } catch (error) {
+      console.error("Token refresh error:", error);
 
-      // Store the new access token
-      localStorage.setItem("Tr9kLmXzQ", accessToken);
-
-      // Update admin data if provided
-      if (admin) {
-        localStorage.setItem("d4aAdmin", JSON.stringify(admin));
-      }
-
-      return true;
+      return false;
     }
-
-    return false;
-  } catch (error) {
-    console.error("Token refresh error:", error);
-
-
-
-    return false;
-  }
-};
+  };
 
   const handleKeepLoggedIn = async () => {
     const success = await refreshAccessToken();
@@ -99,7 +101,6 @@ function App() {
         const decoded = jwtDecode(storedToken);
         const now = Math.floor(Date.now() / 1000);
         const timeUntilExpiry = decoded.exp - now;
-        
 
         if (timeUntilExpiry <= 30 && timeUntilExpiry > 0) {
           if (!showSessionModal) {
@@ -107,8 +108,7 @@ function App() {
             setShowSessionModal(true);
             setCountdown(timeUntilExpiry);
           }
-        }
-        else if (timeUntilExpiry <= 0) {
+        } else if (timeUntilExpiry <= 0) {
           if (showSessionModal) {
             handleSessionExpired();
           } else {
@@ -174,9 +174,21 @@ function App() {
     }
   }, [isAuthenticated, sessionExpired]);
 
+  useEffect(() => {
+    dispatch(fetchStudentsCohorts());
+  }, [dispatch]);
+  useEffect(() => {
+    if (isAuthenticated && location.pathname === "/admin-067") {
+      navigate("/admin-home", { replace: true });
+    }
+  }, [isAuthenticated, location.pathname, navigate]);
+
   if (loading) {
     return (
-      <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 z-50">
+      <div
+        className="absolute inset-0
+      flex items-center justify-center bg-gray-100 bg-opacity-50 z-50"
+      >
         <div className="flex items-center space-x-2">
           <div className="w-6 h-6 border-4 border-t-4 border-[var(--d4a-blue)] border-solid rounded-full animate-spin"></div>
           <span className="text-[var(--d4a-black)] text-lg font-['Karla']">
@@ -201,37 +213,35 @@ function App() {
           </div>
         }
       >
-        <BrowserRouter>
-          <Routes>
-            {appRoutes.map((route) => {
-              const Component = route.component;
+        <Routes>
+          {appRoutes.map((route) => {
+            const Component = route.component;
 
-              if (route.requireAuth) {
-                return (
-                  <Route
-                    key={route.path}
-                    path={route.path}
-                    element={
-                      isAuthenticated && !sessionExpired ? (
-                        <Component />
-                      ) : (
-                        <Navigate replace to="/admin-067" />
-                      )
-                    }
-                  />
-                );
-              }
-
+            if (route.requireAuth) {
               return (
                 <Route
                   key={route.path}
                   path={route.path}
-                  element={<Component />}
+                  element={
+                    isAuthenticated && !sessionExpired ? (
+                      <Component />
+                    ) : (
+                      <Navigate replace to="/admin-067" />
+                    )
+                  }
                 />
               );
-            })}
-          </Routes>
-        </BrowserRouter>
+            }
+
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={<Component />}
+              />
+            );
+          })}
+        </Routes>
       </Suspense>
 
       {showSessionModal && (
