@@ -6,6 +6,7 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/auth.routes.js';
 import masterclassRoutes from './routes/masterclass.routes.js'
 import cohortRoutes from './routes/cohort.routes.js'
+import enrollmentsRoutes from './routes/enrollment.routes.js'
 import cookieParser from 'cookie-parser';
 
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/masterclass', masterclassRoutes)
 app.use('/api/v1/cohort', cohortRoutes)
+app.use('/api/v1/enrollment', enrollmentsRoutes)
 
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the API' });

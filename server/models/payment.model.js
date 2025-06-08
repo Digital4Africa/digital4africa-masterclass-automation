@@ -2,16 +2,7 @@ import mongoose from "mongoose";
 
 const paymentSchema = new mongoose.Schema(
 	{
-		learner: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "Learner",
-			required: true,
-		},
-		masterclass: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "Masterclass",
-			required: true,
-		},
+		
 		reference: {
 			type: String,
 			required: true,
