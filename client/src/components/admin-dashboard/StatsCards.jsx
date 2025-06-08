@@ -1,22 +1,19 @@
 import { useSelector } from "react-redux";
 
 const StatsCards = () => {
-  const { allMasterclasses } = useSelector((state) => state.allMasterclasses);
+
   const { allCohorts, loading } = useSelector((state) => state.cohorts);
 
-  const masterclasses = allMasterclasses || [];
+
   const cohorts = allCohorts || [];
 
-  // Get current date and month boundaries
+
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
   const currentYear = currentDate.getFullYear();
   const monthStart = new Date(currentYear, currentMonth, 1);
 
-  // Calculate total masterclasses
-  const totalMasterclasses = masterclasses.length;
 
-  // Calculate upcoming and ongoing cohorts
   const upcoming = cohorts.filter((cohort) => {
     const startDate = new Date(cohort.startDate);
     return currentDate < startDate;
@@ -27,6 +24,8 @@ const StatsCards = () => {
     const endDate = new Date(cohort.endDate);
     return currentDate >= startDate && currentDate <= endDate;
   }).length;
+
+  const totalActiveMasterclasses = upcoming + ongoing
 
   // Calculate total discounts MTD
   const totalDiscountsMTD = cohorts.reduce((total, cohort) => {
@@ -71,8 +70,8 @@ const StatsCards = () => {
 
   const stats = [
     {
-      title: "Total Masterclasses",
-      value: loading ? <LoadingSpinner /> : totalMasterclasses,
+      title: "Active Masterclasses",
+      value: loading ? <LoadingSpinner /> : totalActiveMasterclasses,
     },
     {
       title: "Upcoming",
