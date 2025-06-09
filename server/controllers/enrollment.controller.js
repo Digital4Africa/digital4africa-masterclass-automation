@@ -2,94 +2,18 @@
 
 import Cohort from "../models/cohort.model.js";
 import Discount from "../models/discount.model.js";
-
-export const validateEnrollmentBeforePayment = async (req, res) => {
-	try {
-		const { fullName, email, cohortId, amount } = req.body;
-
-		if (!fullName || !email || !cohortId || amount === undefined) {
-			return res.status(400).json({
-				success: false,
-				message: "Full name, email, amount, and cohortId are required.",
-			});
-		}
-
-		const cohort = await Cohort.findById(cohortId);
-		if (!cohort) {
-			return res.status(404).json({
-				success: false,
-				message: "Cohort not found.",
-			});
-		}
-
-		const cohortPrice = cohort.masterclassPrice;
-
-		const existingPayment = cohort.payments.find(p => p.email === email);
-		const allocatedDiscount = existingPayment && existingPayment.discount ? existingPayment.discount : 0;
-		const alreadyPaid = existingPayment ? (existingPayment.amount + allocatedDiscount) : 0;
-
-		if (alreadyPaid >= cohortPrice) {
-			return res.status(400).json({
-				success: false,
-				message: "You have already fully paid for this masterclass. No further payment is required.",
-			});
-		}
-
-		const discount = await Discount.findOne({ email, cohortId, isUsed: false });
-		const discountAmount = discount ? discount.amountOff : 0;
-
-		const totalAfterThisPayment = alreadyPaid + amount + discountAmount;
-		const allowedTotal = cohortPrice - alreadyPaid;
-
-		if (totalAfterThisPayment > allowedTotal) {
-			const overpay = totalAfterThisPayment - allowedTotal;
-
-			let message = `You're overpaying by ${overpay}.`;
-			if (discountAmount > 0) {
-				message += ` You have a discount of ${discountAmount}.`;
-			}
-			message += ` Please pay exactly ${allowedTotal - alreadyPaid - discountAmount}.`;
-
-			return res.status(400).json({
-				success: false,
-				message,
-			});
-		}
-
-
-		return res.status(200).json({
-			success: true,
-			message: "Proceed with payment",
-		});
-
-	} catch (error) {
-		console.error("Enrollment validation failed:", error);
-		res.status(500).json({
-			success: false,
-			message: "Internal server error.",
-		});
-	}
-};
-
+import Payment from "../models/payment.model.js"
+import axios from 'axios'
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
-export const enrollStudentAfterPayment = async (req, res) => {
+export const validateEnrollmentBeforePayment = async (req, res) => {
   try {
-    const { fullName, email, cohortId, amount, reference } = req.body;
+    const { fullName, email, cohortId, amount } = req.body;
 
-    if (!reference || !email || !cohortId || !amount || !fullName) {
+    if (!fullName || !email || !cohortId || amount === undefined) {
       return res.status(400).json({
         success: false,
-        message: "Missing required fields",
-      });
-    }
-
-    const existingPayment = await Payment.findOne({ reference });
-    if (existingPayment) {
-      return res.status(409).json({
-        success: false,
-        message: "Payment with this reference already exists",
-        data: existingPayment,
+        message: "Full name, email, amount, and cohortId are required.",
       });
     }
 
@@ -97,11 +21,121 @@ export const enrollStudentAfterPayment = async (req, res) => {
     if (!cohort) {
       return res.status(404).json({
         success: false,
-        message: "Cohort not found",
+        message: "Cohort not found.",
       });
     }
 
-    // ✅ Verify with Paystack
+    const cohortPrice = cohort.masterclassPrice;
+
+    const existingPayment = cohort.payments.find(p => p.email === email);
+    const allocatedDiscount = existingPayment && existingPayment.discount ? existingPayment.discount : 0;
+    const alreadyPaid = existingPayment ? (existingPayment.amount + allocatedDiscount) : 0;
+
+    if (alreadyPaid >= cohortPrice) {
+      return res.status(400).json({
+        success: false,
+        message: "You have already fully paid for this masterclass. No further payment is required.",
+      });
+    }
+
+    const discount = await Discount.findOne({ email, cohortId, isUsed: false });
+    const discountAmount = discount ? discount.amountOff : 0;
+
+    const totalAfterThisPayment = alreadyPaid + amount + discountAmount;
+    const allowedTotal = cohortPrice - alreadyPaid;
+
+    if (totalAfterThisPayment > allowedTotal) {
+      const overpay = totalAfterThisPayment - allowedTotal;
+
+      let message = `You're overpaying by ${overpay}.`;
+      if (discountAmount > 0) {
+        message += ` You have a discount of ${discountAmount}.`;
+      }
+      message += ` Please pay exactly ${allowedTotal - alreadyPaid - discountAmount}.`;
+
+      return res.status(400).json({
+        success: false,
+        message,
+      });
+    }
+
+
+    return res.status(200).json({
+      success: true,
+      message: "Proceed with payment",
+    });
+
+  } catch (error) {
+    console.error("Enrollment validation failed:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
+  }
+};
+
+
+
+export const enrollStudentAfterPayment = async (req, res) => {
+  try {
+    const { fullName, email, cohortId, amount, reference } = req.body;
+
+    if (!fullName) {
+      return res.status(400).json({ success: false, message: "Full name is required" });
+    }
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required" });
+    }
+    if (!cohortId) {
+      return res.status(400).json({ success: false, message: "Cohort ID is required" });
+    }
+    if (!amount) {
+      return res.status(400).json({ success: false, message: "Amount is required" });
+    }
+    if (!reference) {
+      return res.status(400).json({ success: false, message: "Payment reference is required" });
+    }
+
+    let paymentRecord = await Payment.findOne({ reference });
+
+    if (paymentRecord) {
+      if (paymentRecord.status === "success") {
+        return res.status(409).json({
+          success: false,
+          message: "Payment has already been verified and processed",
+          data: paymentRecord,
+        });
+      } else {
+        paymentRecord.customer.email = email;
+        paymentRecord.cohortId = cohortId;
+        paymentRecord.remarks = "Updated user info before verification";
+        await paymentRecord.save();
+      }
+    } else {
+      paymentRecord = await Payment.create({
+        reference,
+        amount: 0,
+        currency: "KES",
+        status: "pending",
+        channel: "unknown",
+        customer: {
+          email,
+          phone: "",
+        },
+        remarks: "Initiated payment verification",
+        cohortId,
+      });
+    }
+
+    const cohort = await Cohort.findById(cohortId);
+    if (!cohort) {
+      await Payment.findByIdAndUpdate(paymentRecord._id, {
+        status: "failed",
+        remarks: "Cohort not found",
+      });
+      return res.status(404).json({ success: false, message: "Cohort not found" });
+    }
+
     const verifyResponse = await axios.get(
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
@@ -118,15 +152,18 @@ export const enrollStudentAfterPayment = async (req, res) => {
       !paystackData ||
       paystackData.status !== "success"
     ) {
+      await Payment.findByIdAndUpdate(paymentRecord._id, {
+        status: "failed",
+        remarks: "Paystack verification failed or payment was not successful",
+      });
       return res.status(400).json({
         success: false,
         message: "Payment verification failed or was not successful",
       });
     }
 
-    const payAmount = paystackData.amount / 100; // Convert to KES if needed
+    const payAmount = paystackData.amount / 100;
 
-    // ✅ Check for discount
     const discountDoc = await Discount.findOne({
       email,
       cohortId,
@@ -135,63 +172,69 @@ export const enrollStudentAfterPayment = async (req, res) => {
 
     const discountAmount = discountDoc?.amountOff || 0;
 
-    // ✅ Save payment transaction
-    const newPayment = await Payment.create({
-      cohortId,
-      reference,
-      amount: payAmount,
-      currency: paystackData.currency || "KES",
-      status: "success",
-      channel: paystackData.channel || "unknown",
-      customer: {
-        email: paystackData.customer.email || email,
-        phone: paystackData.customer.phone || "",
+    await Payment.findByIdAndUpdate(
+      paymentRecord._id,
+      {
+        amount: payAmount,
+        currency: paystackData.currency || "KES",
+        status: "success",
+        channel: paystackData.channel || "unknown",
+        customer: {
+          email: paystackData.customer.email || "",
+          phone: paystackData.customer.phone || "",
+        },
+        remarks: "Payment verified and successful",
+        cohortId,
       },
-      discount: discountAmount || 0,
-      remarks: "Paystack payment verified",
-    });
+      { new: true }
+    );
 
-    // ✅ Update cohort payments array
+    let totalFinalPay;
     const existingPayRecord = cohort.payments.find(p => p.email === email);
     if (existingPayRecord) {
       existingPayRecord.amount += payAmount;
+
       if (discountAmount && !existingPayRecord.discount) {
         existingPayRecord.discount = discountAmount;
       }
+
+      // Make sure totalFinalPay is calculated regardless
+      totalFinalPay = existingPayRecord.amount + (existingPayRecord.discount || 0);
     } else {
       cohort.payments.push({
         email,
         amount: payAmount,
         discount: discountAmount || 0,
       });
+
+      totalFinalPay = payAmount + (discountAmount || 0);
     }
 
-    // ✅ Mark discount as used
     if (discountDoc) {
       discountDoc.isUsed = true;
       await discountDoc.save();
     }
 
-    // ✅ Add student if not already added
     const alreadyStudent = cohort.students.some(s => s.email === email);
     if (!alreadyStudent) {
-      cohort.students.push({
-        fullName,
-        email,
-      });
+      cohort.students.push({ fullName, email });
     }
 
     await cohort.save();
+
+    const balance = cohort.masterclassPrice - totalFinalPay;
 
     return res.status(200).json({
       success: true,
       message: "Payment verified and student enrolled",
       data: {
-        student: { fullName, email },
-        cohortId,
-        payment: newPayment,
-      },
+        cohortPrice: cohort.masterclassPrice,
+        discount: discountAmount || existingPayRecord?.discount || 0,
+        amountPaid: totalFinalPay - (discountAmount || existingPayRecord?.discount || 0),
+        balanceRemaining: balance > 0 ? balance : 0,
+      }
     });
+
   } catch (error) {
     console.error("enrollStudentAfterPayment error:", error.message);
     return res.status(500).json({

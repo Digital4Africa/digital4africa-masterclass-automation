@@ -1,8 +1,9 @@
 import express from 'express';
-import { validateEnrollmentBeforePayment } from '../controllers/enrollment.controller.js';
+import { enrollStudentAfterPayment, validateEnrollmentBeforePayment } from '../controllers/enrollment.controller.js';
 
 const router = express.Router();
 router.post("/validate", validateEnrollmentBeforePayment);
+router.post("/complete", enrollStudentAfterPayment);
 
 
 
