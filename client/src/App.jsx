@@ -15,6 +15,7 @@ import Toast from "./components/Toast";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
 import { fetchStudentsCohorts } from "./features/cohorts/cohortsSliceStudentsDetails";
+import Overlay from "./components/Overlay";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function App() {
@@ -201,6 +202,7 @@ function App() {
 
   return (
     <div>
+      
       <Suspense
         fallback={
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 z-50">

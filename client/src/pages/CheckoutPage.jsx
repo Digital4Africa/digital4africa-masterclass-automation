@@ -161,6 +161,7 @@ const CheckoutPage = () => {
               <CheckoutForm
                 price={cohortData.masterclassPrice}
                 startDate={cohortData.startDate}
+                cohortId={cohortId}
               />
             </div>
           </div>

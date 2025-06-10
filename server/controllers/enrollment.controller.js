@@ -41,8 +41,13 @@ export const validateEnrollmentBeforePayment = async (req, res) => {
     const discount = await Discount.findOne({ email, cohortId, isUsed: false });
     const discountAmount = discount ? discount.amountOff : 0;
 
-    const totalAfterThisPayment = alreadyPaid + amount + discountAmount;
+    const totalAfterThisPayment =
+      parseFloat(alreadyPaid) + parseFloat(amount) + parseFloat(discountAmount);
+
     const allowedTotal = cohortPrice - alreadyPaid;
+
+    console.log("totalAfterThisPayment: ", totalAfterThisPayment);
+    console.log("allowedTotal: ", allowedTotal);
 
     if (totalAfterThisPayment > allowedTotal) {
       const overpay = totalAfterThisPayment - allowedTotal;
@@ -112,19 +117,28 @@ export const enrollStudentAfterPayment = async (req, res) => {
         await paymentRecord.save();
       }
     } else {
-      paymentRecord = await Payment.create({
-        reference,
-        amount: 0,
-        currency: "KES",
-        status: "pending",
-        channel: "unknown",
-        customer: {
-          email,
-          phone: "",
-        },
-        remarks: "Initiated payment verification",
-        cohortId,
-      });
+      try {
+        paymentRecord = await Payment.create({
+          reference,
+          amount: 0,
+          currency: "KES",
+          status: "pending",
+          channel: "unknown",
+          customer: {
+            email,
+            phone: "",
+          },
+          remarks: "Initiated payment verification",
+          cohortId,
+        });
+      } catch (err) {
+        // Handle duplicate key error gracefully
+        if (err.code === 11000 && err.keyPattern?.reference) {
+          paymentRecord = await Payment.findOne({ reference });
+        } else {
+          throw err; // unknown error, rethrow it
+        }
+      }
     }
 
     const cohort = await Cohort.findById(cohortId);
@@ -172,21 +186,24 @@ export const enrollStudentAfterPayment = async (req, res) => {
 
     const discountAmount = discountDoc?.amountOff || 0;
 
-    await Payment.findByIdAndUpdate(
-      paymentRecord._id,
+    // Use findOneAndUpdate safely again
+    paymentRecord = await Payment.findOneAndUpdate(
+      { reference },
       {
-        amount: payAmount,
-        currency: paystackData.currency || "KES",
-        status: "success",
-        channel: paystackData.channel || "unknown",
-        customer: {
-          email: paystackData.customer.email || "",
-          phone: paystackData.customer.phone || "",
+        $setOnInsert: {
+          amount: 0,
+          currency: "KES",
+          status: "pending",
+          channel: "unknown",
+          customer: {
+            email,
+            phone: "",
+          },
+          remarks: "Initiated payment verification",
+          cohortId,
         },
-        remarks: "Payment verified and successful",
-        cohortId,
       },
-      { new: true }
+      { new: true, upsert: true }
     );
 
     let totalFinalPay;
@@ -198,7 +215,6 @@ export const enrollStudentAfterPayment = async (req, res) => {
         existingPayRecord.discount = discountAmount;
       }
 
-      // Make sure totalFinalPay is calculated regardless
       totalFinalPay = existingPayRecord.amount + (existingPayRecord.discount || 0);
     } else {
       cohort.payments.push({
