@@ -27,8 +27,10 @@ export const validateEnrollmentBeforePayment = async (req, res) => {
     const cohortPrice = cohort.masterclassPrice;
 
     const existingPayment = cohort.payments.find((p) => p.email === email);
+    console.log("existingPayment: ", existingPayment);
     const allocatedDiscount = existingPayment?.discount || 0;
     const alreadyPaid = existingPayment ? existingPayment.amount + allocatedDiscount : 0;
+    console.log("alreadyPaid: ", alreadyPaid);
 
     if (alreadyPaid >= cohortPrice) {
       return res.status(400).json({
@@ -41,15 +43,18 @@ export const validateEnrollmentBeforePayment = async (req, res) => {
     const discountAmount = discount ? discount.amountOff : 0;
 
     const totalAfterThisPayment = parseFloat(alreadyPaid) + parseFloat(amount) + parseFloat(discountAmount);
-    const allowedTotal = cohortPrice - alreadyPaid;
+    console.log("incoming amount: ", parseFloat(amount));
 
-    if (totalAfterThisPayment > allowedTotal) {
-      const overpay = totalAfterThisPayment - allowedTotal;
+    console.log("totalAfterThisPayment: ", totalAfterThisPayment);
+    console.log("cohortPrice: ", cohortPrice);
+
+    if (totalAfterThisPayment > cohortPrice) {
+      const overpay = totalAfterThisPayment - cohortPrice;
       let message = `You're overpaying by ${overpay}.`;
       if (discountAmount > 0) {
         message += ` You have a discount of ${discountAmount}.`;
       }
-      message += ` Please pay exactly ${allowedTotal - discountAmount}.`;
+      message += ` Please pay exactly ${cohortPrice - alreadyPaid - discountAmount}.`;
 
       return res.status(400).json({
         success: false,
@@ -63,6 +68,7 @@ export const validateEnrollmentBeforePayment = async (req, res) => {
     });
 
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       success: false,
       message: "Internal server error.",
