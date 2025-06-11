@@ -1,9 +1,8 @@
-// controllers/enrollmentController.js
-
 import Cohort from "../models/cohort.model.js";
 import Discount from "../models/discount.model.js";
-import Payment from "../models/payment.model.js"
-import axios from 'axios'
+import Payment from "../models/payment.model.js";
+import axios from "axios";
+
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
 export const validateEnrollmentBeforePayment = async (req, res) => {
@@ -27,9 +26,9 @@ export const validateEnrollmentBeforePayment = async (req, res) => {
 
     const cohortPrice = cohort.masterclassPrice;
 
-    const existingPayment = cohort.payments.find(p => p.email === email);
-    const allocatedDiscount = existingPayment && existingPayment.discount ? existingPayment.discount : 0;
-    const alreadyPaid = existingPayment ? (existingPayment.amount + allocatedDiscount) : 0;
+    const existingPayment = cohort.payments.find((p) => p.email === email);
+    const allocatedDiscount = existingPayment?.discount || 0;
+    const alreadyPaid = existingPayment ? existingPayment.amount + allocatedDiscount : 0;
 
     if (alreadyPaid >= cohortPrice) {
       return res.status(400).json({
@@ -41,22 +40,16 @@ export const validateEnrollmentBeforePayment = async (req, res) => {
     const discount = await Discount.findOne({ email, cohortId, isUsed: false });
     const discountAmount = discount ? discount.amountOff : 0;
 
-    const totalAfterThisPayment =
-      parseFloat(alreadyPaid) + parseFloat(amount) + parseFloat(discountAmount);
-
+    const totalAfterThisPayment = parseFloat(alreadyPaid) + parseFloat(amount) + parseFloat(discountAmount);
     const allowedTotal = cohortPrice - alreadyPaid;
-
-    console.log("totalAfterThisPayment: ", totalAfterThisPayment);
-    console.log("allowedTotal: ", allowedTotal);
 
     if (totalAfterThisPayment > allowedTotal) {
       const overpay = totalAfterThisPayment - allowedTotal;
-
       let message = `You're overpaying by ${overpay}.`;
       if (discountAmount > 0) {
         message += ` You have a discount of ${discountAmount}.`;
       }
-      message += ` Please pay exactly ${allowedTotal - alreadyPaid - discountAmount}.`;
+      message += ` Please pay exactly ${allowedTotal - discountAmount}.`;
 
       return res.status(400).json({
         success: false,
@@ -64,14 +57,12 @@ export const validateEnrollmentBeforePayment = async (req, res) => {
       });
     }
 
-
     return res.status(200).json({
       success: true,
       message: "Proceed with payment",
     });
 
   } catch (error) {
-    console.error("Enrollment validation failed:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error.",
@@ -79,26 +70,15 @@ export const validateEnrollmentBeforePayment = async (req, res) => {
   }
 };
 
-
-
 export const enrollStudentAfterPayment = async (req, res) => {
+
+  console.log("ENROLLMENT ATTEMPT", req.body);
+
   try {
     const { fullName, email, cohortId, amount, reference } = req.body;
 
-    if (!fullName) {
-      return res.status(400).json({ success: false, message: "Full name is required" });
-    }
-    if (!email) {
-      return res.status(400).json({ success: false, message: "Email is required" });
-    }
-    if (!cohortId) {
-      return res.status(400).json({ success: false, message: "Cohort ID is required" });
-    }
-    if (!amount) {
-      return res.status(400).json({ success: false, message: "Amount is required" });
-    }
-    if (!reference) {
-      return res.status(400).json({ success: false, message: "Payment reference is required" });
+    if (!fullName || !email || !cohortId || !amount || !reference) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
     let paymentRecord = await Payment.findOne({ reference });
@@ -124,19 +104,15 @@ export const enrollStudentAfterPayment = async (req, res) => {
           currency: "KES",
           status: "pending",
           channel: "unknown",
-          customer: {
-            email,
-            phone: "",
-          },
+          customer: { email, phone: "" },
           remarks: "Initiated payment verification",
           cohortId,
         });
       } catch (err) {
-        // Handle duplicate key error gracefully
         if (err.code === 11000 && err.keyPattern?.reference) {
           paymentRecord = await Payment.findOne({ reference });
         } else {
-          throw err; // unknown error, rethrow it
+          throw err;
         }
       }
     }
@@ -161,11 +137,7 @@ export const enrollStudentAfterPayment = async (req, res) => {
 
     const paystackData = verifyResponse.data?.data;
 
-    if (
-      !verifyResponse.data.status ||
-      !paystackData ||
-      paystackData.status !== "success"
-    ) {
+    if (!verifyResponse.data.status || !paystackData || paystackData.status !== "success") {
       await Payment.findByIdAndUpdate(paymentRecord._id, {
         status: "failed",
         remarks: "Paystack verification failed or payment was not successful",
@@ -178,52 +150,22 @@ export const enrollStudentAfterPayment = async (req, res) => {
 
     const payAmount = paystackData.amount / 100;
 
-    const discountDoc = await Discount.findOne({
-      email,
-      cohortId,
-      isUsed: false,
-    });
-
+    const discountDoc = await Discount.findOne({ email, cohortId, isUsed: false });
     const discountAmount = discountDoc?.amountOff || 0;
 
-    // Use findOneAndUpdate safely again
-    paymentRecord = await Payment.findOneAndUpdate(
-      { reference },
-      {
-        $setOnInsert: {
-          amount: 0,
-          currency: "KES",
-          status: "pending",
-          channel: "unknown",
-          customer: {
-            email,
-            phone: "",
-          },
-          remarks: "Initiated payment verification",
-          cohortId,
-        },
-      },
-      { new: true, upsert: true }
-    );
+    let existingPayRecord = cohort.payments.find(p => p.email === email);
 
-    let totalFinalPay;
-    const existingPayRecord = cohort.payments.find(p => p.email === email);
     if (existingPayRecord) {
       existingPayRecord.amount += payAmount;
-
-      if (discountAmount && !existingPayRecord.discount) {
+      if (!existingPayRecord.discount && discountAmount) {
         existingPayRecord.discount = discountAmount;
       }
-
-      totalFinalPay = existingPayRecord.amount + (existingPayRecord.discount || 0);
     } else {
       cohort.payments.push({
         email,
         amount: payAmount,
         discount: discountAmount || 0,
       });
-
-      totalFinalPay = payAmount + (discountAmount || 0);
     }
 
     if (discountDoc) {
@@ -238,6 +180,24 @@ export const enrollStudentAfterPayment = async (req, res) => {
 
     await cohort.save();
 
+    await Payment.findOneAndUpdate(
+      { reference },
+      {
+        amount: payAmount,
+        currency: paystackData.currency,
+        status: paystackData.status,
+        channel: paystackData.channel,
+        customer: {
+          email: paystackData.customer.email,
+          phone: paystackData.customer.phone || "",
+        },
+        remarks: "Payment successful and student enrolled",
+      },
+      { new: true }
+    );
+
+    const updatedPayRecord = cohort.payments.find(p => p.email === email);
+    const totalFinalPay = updatedPayRecord.amount + (updatedPayRecord.discount || 0);
     const balance = cohort.masterclassPrice - totalFinalPay;
 
     return res.status(200).json({
@@ -245,14 +205,13 @@ export const enrollStudentAfterPayment = async (req, res) => {
       message: "Payment verified and student enrolled",
       data: {
         cohortPrice: cohort.masterclassPrice,
-        discount: discountAmount || existingPayRecord?.discount || 0,
-        amountPaid: totalFinalPay - (discountAmount || existingPayRecord?.discount || 0),
+        discount: updatedPayRecord.discount,
+        amountPaid: updatedPayRecord.amount,
         balanceRemaining: balance > 0 ? balance : 0,
       }
     });
 
   } catch (error) {
-    console.error("enrollStudentAfterPayment error:", error.message);
     return res.status(500).json({
       success: false,
       message: "Internal server error",

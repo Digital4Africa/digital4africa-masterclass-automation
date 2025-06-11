@@ -1,67 +1,51 @@
 import { useState, useEffect } from "react";
-
 import { completeEnrollment } from "../../utils/checkoutUtil";
 
-
-
 const PaymentCompletionModal = ({ paymentData, userEmail, onClose }) => {
-  const [status, setStatus] = useState("loading"); // loading, success, error
+  const [status, setStatus] = useState("loading");
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false); // Add processing state
 
+  // Extract the payment processing logic into a separate function
+  const processPayment = async () => {
+    if (isProcessing) return; // Prevent multiple simultaneous calls
 
-  useEffect(() => {
-    const processPayment = async () => {
-      try {
-        const response = await completeEnrollment(paymentData);
-
-        if (response.success) {
-          setStatus("success");
-          setResult(response.data);
-        } else {
-          setStatus("error");
-          setError(response.message);
-        }
-      } catch (err) {
-		console.log(err);
-        setStatus("error");
-        setError("Payment verification failed. Please try again.");
-      }
-    };
-
-    processPayment();
-  }, [paymentData]);
-
-  const handleClose = () => {
-
-    onClose?.();
-  };
-
-  const handleRetry = () => {
+    setIsProcessing(true);
     setStatus("loading");
     setError("");
     setResult(null);
 
-    // Retry the payment completion
-    const processPayment = async () => {
-      try {
-        const response = await completeEnrollment(paymentData);
+    try {
+      const response = await completeEnrollment(paymentData);
 
-        if (response.success) {
-          setStatus("success");
-          setResult(response.data);
-        } else {
-          setStatus("error");
-          setError(response.message);
-        }
-      } catch (err) {
-		console.log(err);
+      if (response.success) {
+        setStatus("success");
+        setResult(response.data);
+      } else {
         setStatus("error");
-        setError("Payment verification failed. Please try again.");
+        setError(response.message);
       }
-    };
+    } catch (err) {
+      console.log(err);
+      setStatus("error");
+      setError("Payment verification failed. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
+  useEffect(() => {
+    // Only process payment once when component mounts
     processPayment();
+  }, []); // Remove paymentData from dependency array
+
+  const handleClose = () => {
+    onClose?.();
+  };
+
+  const handleRetry = () => {
+    processPayment(); // Use the extracted function
   };
 
   return (
@@ -186,9 +170,10 @@ const PaymentCompletionModal = ({ paymentData, userEmail, onClose }) => {
 
             <button
               onClick={handleRetry}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 mb-3"
+              disabled={isProcessing}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 mb-3"
             >
-              Retry Verification
+              {isProcessing ? "Retrying..." : "Retry Verification"}
             </button>
           </div>
         )}

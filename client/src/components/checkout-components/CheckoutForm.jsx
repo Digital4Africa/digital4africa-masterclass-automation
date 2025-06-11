@@ -17,6 +17,17 @@ const CheckoutForm = ({ price, cohortId }) => {
     email: "",
   });
 
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      email: "",
+    });
+    setPaymentType("full");
+    setPartialAmount("");
+  };
+
+
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -25,6 +36,7 @@ const CheckoutForm = ({ price, cohortId }) => {
   const handleModalClose = () => {
     setShowCompletionModal(false);
     setPaymentData(null);
+    resetForm()
 
   };
 
