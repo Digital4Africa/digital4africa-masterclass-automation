@@ -2,6 +2,7 @@ import Cohort from "../models/cohort.model.js";
 import Discount from "../models/discount.model.js";
 import Payment from "../models/payment.model.js";
 import axios from "axios";
+import { sendReceiptEmail } from "../utils/sendReciept.js";
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
@@ -61,6 +62,8 @@ export const validateEnrollmentBeforePayment = async (req, res) => {
         message,
       });
     }
+
+
 
     return res.status(200).json({
       success: true,
@@ -205,6 +208,19 @@ export const enrollStudentAfterPayment = async (req, res) => {
     const updatedPayRecord = cohort.payments.find(p => p.email === email);
     const totalFinalPay = updatedPayRecord.amount + (updatedPayRecord.discount || 0);
     const balance = cohort.masterclassPrice - totalFinalPay;
+
+    await sendReceiptEmail({
+      fullName,
+      startDate: cohort.startDate,
+      email,
+      reference,
+      amountPaid: updatedPayRecord.amount,
+      totalPrice: cohort.masterclassPrice,
+      cohortName: cohort.masterclassTitle,
+      balanceRemaining: balance,
+      discount: updatedPayRecord.discount,
+    });
+
 
     return res.status(200).json({
       success: true,
