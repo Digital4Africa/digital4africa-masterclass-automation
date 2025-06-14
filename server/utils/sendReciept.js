@@ -36,6 +36,13 @@ export const sendReceiptEmail = async ({
       day: 'numeric',
     });
 
+    const formattedStartDate = new Date(startDate).toLocaleDateString('en-US', {
+			weekday: 'short',
+			month: 'short',
+			day: 'numeric',
+			year: 'numeric',
+		});
+
     const formatCurrency = (amount) => `KES ${amount.toLocaleString()}`;
 
     const hasDiscount = discount && discount > 0;
@@ -49,7 +56,7 @@ export const sendReceiptEmail = async ({
         <title>Payment Receipt</title>
       </head>
       <body style="margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-        <div style="max-width: 500px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+        <div style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
 
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #0069AA 0%, #E32726 100%); padding: 30px 40px; text-align: center; position: relative;">
@@ -60,13 +67,13 @@ export const sendReceiptEmail = async ({
           </div>
 
           <!-- Content -->
-          <div style="padding: 40px;">
+          <div style="padding: 20px;">
 
             <!-- Greeting -->
             <div style="margin-bottom: 30px;">
               <p style="color: #2d3748; font-size: 18px; margin: 0 0 8px; font-weight: 500;">Hi ${fullName},</p>
               <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">Thank you for your payment towards <strong style="color: #2d3748;">${cohortName}</strong></p>
-              <p style="color: #718096; font-size: 15px; margin: 8px 0 0; line-height: 1.5;">Starting on <strong style="color: #2d3748;">${startDate}</strong></p>
+              <p style="color: #718096; font-size: 15px; margin: 8px 0 0; line-height: 1.5;">Starting on <strong style="color: #2d3748;">${formattedStartDate}</strong></p>
             </div>
 
             <!-- Receipt Details -->

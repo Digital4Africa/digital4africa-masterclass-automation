@@ -3,6 +3,7 @@ import Discount from "../models/discount.model.js";
 import Payment from "../models/payment.model.js";
 import axios from "axios";
 import { sendReceiptEmail } from "../utils/sendReciept.js";
+import { sendEnrollmentConfirmationEmail } from "../utils/sendWelcomeEmail.js";
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
@@ -220,6 +221,15 @@ export const enrollStudentAfterPayment = async (req, res) => {
       balanceRemaining: balance,
       discount: updatedPayRecord.discount,
     });
+
+    if (balance <= 0) {
+      await sendEnrollmentConfirmationEmail({
+        fullName,
+        email,
+        cohortName: cohort.masterclassTitle,
+        startDate: cohort.startDate,
+      });
+    }
 
 
     return res.status(200).json({
