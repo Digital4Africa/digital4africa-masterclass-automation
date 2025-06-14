@@ -166,7 +166,7 @@ export const sendReceiptEmail = async ({
             <div style="margin-top: 40px; text-align: center; padding-top: 25px; border-top: 1px solid #e2e8f0;">
               <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.6;">
                 Warm regards,<br />
-                <strong style="color: #2d3748;">D4A Academy Team</strong>
+                <strong style="color: #2d3748;">D4A Masterclass Team</strong>
               </p>
             </div>
 
