@@ -23,6 +23,16 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
     return () => dispatch(hideOverlay());
   }, [dispatch]);
 
+  // Helper function to set time to 9 AM or 5 PM EAT (UTC+3)
+  const setTimeForEAT = (dateString, hoursEAT) => {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    // Convert EAT hours to UTC (EAT is UTC+3)
+    const hoursUTC = (hoursEAT + 24 - 3) % 24; // Handle timezone conversion
+    date.setUTCHours(hoursUTC, 0, 0, 0);
+    return date.toISOString();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -35,7 +45,11 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
       return;
     }
 
-    if (new Date(startDate) > new Date(endDate)) {
+    // Set fixed times (9 AM and 5 PM East Africa Time)
+    const startWithTime = setTimeForEAT(startDate, 9); // 9 AM EAT (6 AM UTC)
+    const endWithTime = setTimeForEAT(endDate, 17);    // 5 PM EAT (2 PM UTC)
+
+    if (new Date(startWithTime) >= new Date(endWithTime)) {
       setToast({
         isVisible: true,
         message: "End date must be after start date",
@@ -48,7 +62,6 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
     dispatch(showOverlay());
 
     try {
-      // Find the selected masterclass
       const masterclass = masterclasses.find(
         (m) => m._id === selectedMasterclass
       );
@@ -57,8 +70,8 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
         `${apiUrl}/api/v1/cohort/create-cohort`,
         {
           title: masterclass.title,
-          startDate,
-          endDate,
+          startDate: startWithTime,
+          endDate: endWithTime,
         },
         {
           withCredentials: true,
@@ -74,7 +87,7 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
       setTimeout(() => {
         onClose();
         dispatch(hideOverlay());
-        dispatch(fetchCohorts())
+        dispatch(fetchCohorts());
       }, 1500);
     } catch (error) {
       setToast({
@@ -131,6 +144,7 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
                     value={selectedMasterclass}
                     onChange={(e) => setSelectedMasterclass(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent"
+                    required
                   >
                     <option value="">Select Masterclass</option>
                     {masterclasses.map((masterclass) => (
@@ -150,6 +164,7 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent"
+                    required
                   />
                 </div>
 
@@ -162,6 +177,7 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent"
+                    required
                   />
                 </div>
               </div>
