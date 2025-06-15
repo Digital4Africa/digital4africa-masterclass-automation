@@ -23,6 +23,12 @@ const cohortSchema = new mongoose.Schema({
   masterclassPrice: { type: Number, required: true },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
+  emailNotifications: [{
+    email: String,
+    oneWeekReminderSent: Boolean,
+    twoDayReminderSent: Boolean,
+    dayOfReminderSent: Boolean
+  }],
   students: [studentSubSchema],
   payments: [paymentSubSchema]
 }, {

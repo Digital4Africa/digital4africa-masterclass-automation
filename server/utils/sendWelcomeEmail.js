@@ -31,9 +31,22 @@ export const sendEnrollmentConfirmationEmail = async ({
        <meta charset="utf-8">
        <meta name="viewport" content="width=device-width, initial-scale=1.0">
        <title>Enrollment Confirmation</title>
+	   <style type="text/css">
+      @media only screen and (max-width: 600px) {
+        body {
+          background: #ffffff !important;
+          padding: 0 !important;
+        }
+        .email-container {
+          max-width: 100% !important;
+          border-radius: 0 !important;
+          box-shadow: none !important;
+        }
+      }
+    </style>
      </head>
      <body style="margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-       <div style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+       <div class="email-container" style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
 
          <!-- Header -->
          <div style="background: linear-gradient(135deg, #0069AA 0%, #E32726 100%); padding: 30px 40px; text-align: center; position: relative;">

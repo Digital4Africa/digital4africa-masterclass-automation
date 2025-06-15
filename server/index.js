@@ -8,6 +8,7 @@ import masterclassRoutes from './routes/masterclass.routes.js'
 import cohortRoutes from './routes/cohort.routes.js'
 import enrollmentsRoutes from './routes/enrollment.routes.js'
 import cookieParser from 'cookie-parser';
+import { startEmailScheduler } from './utils/emailScheduler.js';
 
 
 
@@ -15,6 +16,7 @@ import cookieParser from 'cookie-parser';
 dotenv.config();
 
 connectDB();
+startEmailScheduler();
 
 
 const app = express();
