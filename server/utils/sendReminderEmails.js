@@ -5,13 +5,7 @@ dotenv.config();
 
 const client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
 
-export const sendOneWeekReminderEmail = async (
-    {
-  fullName,
-  email,
-  cohortName,
-  startDate,
-}) => {
+export const sendOneWeekReminderEmail = async ({ fullName, email, cohortName, startDate }) => {
   try {
     const formattedStartDate = new Date(startDate).toLocaleDateString('en-US', {
       weekday: 'long',
@@ -20,13 +14,64 @@ export const sendOneWeekReminderEmail = async (
       year: 'numeric',
     });
 
-    // Simple email for now - we'll make it fancy later
     const html = `
-      <h2>Hi ${fullName},</h2>
-      <p>Just a week left until your ${cohortName} starts!</p>
-      <p><strong>Date:</strong> ${formattedStartDate}</p>
-      <p>We're excited to see you there!</p>
-      <p>- D4A Team</p>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>One Week Reminder</title>
+        <style type="text/css">
+          @media only screen and (max-width: 600px) {
+            body { padding: 0 !important; }
+            .email-container { max-width: 100% !important; }
+          }
+        </style>
+      </head>
+      <body style="margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        <div class="email-container" style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #0069AA 0%, #E32726 100%); padding: 30px 40px; text-align: center; position: relative;">
+            <img src="${process.env.LOGO_URL}" alt="Digital4africa" style="height: 45px; margin-bottom: 15px; background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">ONE WEEK TO GO!</h1>
+          </div>
+
+          <!-- Content -->
+          <div style="padding: 20px;">
+            <p style="color: #2d3748; font-size: 18px; margin: 0 0 8px; font-weight: 500;">Hi ${fullName},</p>
+            <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">It’s just a week to the <strong>${cohortName}</strong>! The class runs on <strong>${formattedStartDate}</strong> from <strong>9:00 AM - 4:00 PM</strong>.</p>
+
+            <!-- What to Bring -->
+            <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">
+              <h3 style="color: #0069AA; margin: 0 0 10px;">📝 What to Bring</h3>
+              <ul style="color: #4a5568; margin: 0; padding-left: 20px;">
+                <li>Your laptop</li>
+                <li>A pen and notebook</li>
+                <li>Ready-to-learn mindset!</li>
+              </ul>
+            </div>
+
+            <!-- Directions -->
+            <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">
+              <h3 style="color: #0069AA; margin: 0 0 10px;">📍 Location</h3>
+              <p style="color: #4a5568; margin: 0 0 10px;"><strong>Digital 4 Africa Office</strong><br>Delta Corner Annex, 4th Floor<br>Opposite Westlands Stage, Waiyaki Way</p>
+              <a href="https://g.page/Digital4Africa?share" style="display: inline-block; background: #0069AA; color: #ffffff; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; margin-top: 10px;">View on Google Maps</a>
+            </div>
+
+            <!-- Parking -->
+            <div style="margin: 20px 0; padding: 15px; background: #ebf8ff; border-radius: 8px; border-left: 4px solid #0069AA;">
+              <h3 style="color: #2d3748; margin: 0 0 10px;">🚗 Parking Instructions</h3>
+              <p style="color: #4a5568; margin: 0;">Ask guards to direct you to <strong>Nairobi Garage Parking</strong> on Floor P1. Visitors' parking is to your left after the barrier.</p>
+            </div>
+
+            <!-- Footer -->
+            <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+              <p style="color: #718096; font-size: 14px; margin: 0;">We can’t wait to see you there!<br><strong>D4A Masterclass Team</strong></p>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
     `;
 
     await client.sendEmail({
@@ -42,75 +87,212 @@ export const sendOneWeekReminderEmail = async (
   }
 };
 
-export const sendTwoDayReminderEmail = async ({
-    fullName,
-    email,
-    cohortName,
-    startDate,
-  }) => {
-    try {
-      const formattedStartDate = new Date(startDate).toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      });
+export const sendTwoDayReminderEmail = async ({ fullName, email, cohortName, startDate }) => {
+  try {
+    const formattedStartDate = new Date(startDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
 
-      const html = `
-        <h2>Hi ${fullName},</h2>
-        <p>Just two days left until your ${cohortName} starts!</p>
-        <p><strong>Date:</strong> ${formattedStartDate}</p>
-        <p><strong>Time:</strong> 9:00 AM - 4:00 PM</p>
-        <p><strong>Location:</strong> Digital 4 Africa Office, Delta Corner Annex, 4th Floor</p>
-        <p>Don't forget to bring your laptop and notebook!</p>
-        <p>- D4A Team</p>
-      `;
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Two Day Reminder</title>
+        <style type="text/css">
+          @media only screen and (max-width: 600px) {
+            body { padding: 0 !important; }
+            .email-container { max-width: 100% !important; }
+          }
+        </style>
+      </head>
+      <body style="margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        <div class="email-container" style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #0069AA 0%, #E32726 100%); padding: 30px 40px; text-align: center; position: relative;">
+            <img src="${process.env.LOGO_URL}" alt="Digital4africa" style="height: 45px; margin-bottom: 15px; background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">REMINDER: CLASS STARTS SOON!</h1>
+          </div>
 
-      await client.sendEmail({
-        From: process.env.OPERATIONS_EMAIL,
-        To: email,
-        Subject: `Two Days Until ${cohortName}!`,
-        HtmlBody: html,
-      });
+          <!-- Content -->
+          <div style="padding: 20px;">
+            <p style="color: #2d3748; font-size: 18px; margin: 0 0 8px; font-weight: 500;">Hi ${fullName},</p>
+            <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">Less than 48 hours until <strong>${cohortName}</strong>! Please arrive by <strong>8:30 AM</strong> on <strong>${formattedStartDate}</strong>.</p>
 
-      console.log(`📧 Two day reminder sent to ${email}`);
-    } catch (error) {
-      console.error('❌ Error sending two day reminder:', error.message);
-    }
-  };
+            <!-- Directions -->
+            <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">
+              <h3 style="color: #0069AA; margin: 0 0 10px;">📍 Location</h3>
+              <p style="color: #4a5568; margin: 0 0 10px;"><strong>Delta Corner Annex, 4th Floor</strong><br>Opposite Westlands Stage, Waiyaki Way<br>(Building with BMW Centre & PWC)</p>
+              <a href="https://g.page/Digital4Africa?share" style="display: inline-block; background: #0069AA; color: #ffffff; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; margin-top: 10px;">View on Google Maps</a>
+            </div>
 
-  export const sendDayOfReminderEmail = async ({
-    fullName,
-    email,
-    cohortName,
-    startDate,
-  }) => {
-    try {
-      const formattedStartDate = new Date(startDate).toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      });
+            <!-- Q&A -->
+            <div style="margin: 20px 0; padding: 15px; background: #f0fff4; border-radius: 8px; border-left: 4px solid #38a169;">
+              <h3 style="color: #2d3748; margin: 0 0 10px;">❓ Questions?</h3>
+              <p style="color: #4a5568; margin: 0;">Have burning questions? <a href="#" style="color: #0069AA;">Fill out this form</a> so we can address them in class.</p>
+            </div>
 
-      const html = `
-        <h2>Hi ${fullName},</h2>
-        <p>Today's the day! Your ${cohortName} starts today!</p>
-        <p><strong>Time:</strong> 9:00 AM - 4:00 PM</p>
-        <p><strong>Location:</strong> Digital 4 Africa Office, Delta Corner Annex, 4th Floor</p>
-        <p>We're excited to see you soon!</p>
-        <p>- D4A Team</p>
-      `;
+            <!-- Footer -->
+            <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+              <p style="color: #718096; font-size: 14px; margin: 0;">See you soon!<br><strong>D4A Masterclass Team</strong></p>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
 
-      await client.sendEmail({
-        From: process.env.OPERATIONS_EMAIL,
-        To: email,
-        Subject: `Today: ${cohortName} Starts Now!`,
-        HtmlBody: html,
-      });
+    await client.sendEmail({
+      From: process.env.OPERATIONS_EMAIL,
+      To: email,
+      Subject: `Important Reminder: ${cohortName} Starts Soon!`,
+      HtmlBody: html,
+    });
 
-      console.log(`📧 Day-of reminder sent to ${email}`);
-    } catch (error) {
-      console.error('❌ Error sending day-of reminder:', error.message);
-    }
-  };
+    console.log(`📧 Two-day reminder sent to ${email}`);
+  } catch (error) {
+    console.error('❌ Error sending two-day reminder:', error.message);
+  }
+};
+
+export const sendDayOfReminderEmail = async ({ fullName, email, cohortName, startDate }) => {
+  try {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Day Of Reminder</title>
+        <style type="text/css">
+          @media only screen and (max-width: 600px) {
+            body { padding: 0 !important; }
+            .email-container { max-width: 100% !important; }
+          }
+        </style>
+      </head>
+      <body style="margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        <div class="email-container" style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #0069AA 0%, #E32726 100%); padding: 30px 40px; text-align: center; position: relative;">
+            <img src="${process.env.LOGO_URL}" alt="Digital4africa" style="height: 45px; margin-bottom: 15px; background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">TODAY'S THE DAY!</h1>
+          </div>
+
+          <!-- Content -->
+          <div style="padding: 20px;">
+            <p style="color: #2d3748; font-size: 18px; margin: 0 0 8px; font-weight: 500;">Hi ${fullName},</p>
+            <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">Your <strong>${cohortName}</strong> starts today at <strong>9:00 AM</strong>!</p>
+
+            <!-- WIFI -->
+            <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">
+              <h3 style="color: #0069AA; margin: 0 0 10px;">📶 WIFI Access</h3>
+              <p style="color: #4a5568; margin: 0;"><strong>Network:</strong> Nairobi Garage<br><strong>Password:</strong> COWORK@NG</p>
+            </div>
+
+            <!-- Lunch -->
+            <div style="margin: 20px 0; padding: 15px; background: #f0fff4; border-radius: 8px; border-left: 4px solid #38a169;">
+              <h3 style="color: #2d3748; margin: 0 0 10px;">🍽️ Lunch Options</h3>
+              <p style="color: #4a5568; margin: 0;"><a href="#" style="color: #0069AA;">Fill out this form</a> to choose your lunch.</p>
+            </div>
+
+            <!-- Footer -->
+            <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+              <p style="color: #718096; font-size: 14px; margin: 0;">Let’s make today amazing!<br><strong>D4A Masterclass Team</strong></p>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    await client.sendEmail({
+      From: process.env.OPERATIONS_EMAIL,
+      To: email,
+      Subject: `Today: ${cohortName} Starts Now!`,
+      HtmlBody: html,
+    });
+
+    console.log(`📧 Day-of reminder sent to ${email}`);
+  } catch (error) {
+    console.error('❌ Error sending day-of reminder:', error.message);
+  }
+};
+
+// NEW: Second Day Morning Email
+export const sendSecondDayReminderEmail = async ({ fullName, email, cohortName }) => {
+  try {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Second Day Reminder</title>
+        <style type="text/css">
+          @media only screen and (max-width: 600px) {
+            body { padding: 0 !important; }
+            .email-container { max-width: 100% !important; }
+          }
+        </style>
+      </head>
+      <body style="margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        <div class="email-container" style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #0069AA 0%, #E32726 100%); padding: 30px 40px; text-align: center; position: relative;">
+            <img src="${process.env.LOGO_URL}" alt="Digital4africa" style="height: 45px; margin-bottom: 15px; background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">DAY 2: LET’S KEEP GOING!</h1>
+          </div>
+
+          <!-- Content -->
+          <div style="padding: 20px;">
+            <p style="color: #2d3748; font-size: 18px; margin: 0 0 8px; font-weight: 500;">Hi ${fullName},</p>
+            <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">Hope you enjoyed Day 1 of <strong>${cohortName}</strong>! Here’s what’s coming today:</p>
+
+            <!-- Topics -->
+            <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">
+              <h3 style="color: #0069AA; margin: 0 0 10px;">📚 Today’s Topics</h3>
+              <p style="color: #4a5568; margin: 0;"><a href="#" style="color: #0069AA;">View full list here</a>.</p>
+            </div>
+
+            <!-- Mentorship -->
+            <div style="margin: 20px 0; padding: 15px; background: #ebf8ff; border-radius: 8px; border-left: 4px solid #0069AA;">
+              <h3 style="color: #2d3748; margin: 0 0 10px;">🎓 Free 30-Day Mentorship</h3>
+              <p style="color: #4a5568; margin: 0;">Ask questions anytime for the next month! Reach out to Caleb or Chelsea.</p>
+            </div>
+
+            <!-- Socials -->
+            <div style="margin: 20px 0; padding: 15px; background: #fef5e7; border-radius: 8px; border-left: 4px solid #E32726;">
+              <h3 style="color: #2d3748; margin: 0 0 10px;">📱 Follow Us</h3>
+              <p style="color: #4a5568; margin: 0 0 10px;">Stay updated with D4A:</p>
+              <a href="https://www.instagram.com/digital4africa/" style="display: inline-block; margin-right: 10px; color: #0069AA;">Instagram</a>
+              <a href="https://www.linkedin.com/company/digital-for-africa/" style="display: inline-block; margin-right: 10px; color: #0069AA;">LinkedIn</a>
+              <a href="https://x.com/Digital4Africa" style="display: inline-block; color: #0069AA;">X</a>
+            </div>
+
+            <!-- Footer -->
+            <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+              <p style="color: #718096; font-size: 14px; margin: 0;">Let’s make Day 2 even better!<br><strong>D4A Masterclass Team</strong></p>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    await client.sendEmail({
+      From: process.env.OPERATIONS_EMAIL,
+      To: email,
+      Subject: `Day 2: ${cohortName} Continues!`,
+      HtmlBody: html,
+    });
+
+    console.log(`📧 Second-day reminder sent to ${email}`);
+  } catch (error) {
+    console.error('❌ Error sending second-day reminder:', error.message);
+  }
+};
