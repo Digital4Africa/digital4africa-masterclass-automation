@@ -130,11 +130,7 @@ export const sendTwoDayReminderEmail = async ({ fullName, email, cohortName, sta
               <a href="https://g.page/Digital4Africa?share" style="display: inline-block; background: #0069AA; color: #ffffff; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; margin-top: 10px;">View on Google Maps</a>
             </div>
 
-            <!-- Q&A -->
-            <div style="margin: 20px 0; padding: 15px; background: #f0fff4; border-radius: 8px; border-left: 4px solid #38a169;">
-              <h3 style="color: #2d3748; margin: 0 0 10px;">❓ Questions?</h3>
-              <p style="color: #4a5568; margin: 0;">Have burning questions? <a href="#" style="color: #0069AA;">Fill out this form</a> so we can address them in class.</p>
-            </div>
+         
 
             <!-- Footer -->
             <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
@@ -194,11 +190,7 @@ export const sendDayOfReminderEmail = async ({ fullName, email, cohortName, star
               <p style="color: #4a5568; margin: 0;"><strong>Network:</strong> Nairobi Garage<br><strong>Password:</strong> COWORK@NG</p>
             </div>
 
-            <!-- Lunch -->
-            <div style="margin: 20px 0; padding: 15px; background: #f0fff4; border-radius: 8px; border-left: 4px solid #38a169;">
-              <h3 style="color: #2d3748; margin: 0 0 10px;">🍽️ Lunch Options</h3>
-              <p style="color: #4a5568; margin: 0;"><a href="#" style="color: #0069AA;">Fill out this form</a> to choose your lunch.</p>
-            </div>
+
 
             <!-- Footer -->
             <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
@@ -223,7 +215,6 @@ export const sendDayOfReminderEmail = async ({ fullName, email, cohortName, star
   }
 };
 
-// NEW: Second Day Morning Email
 export const sendSecondDayReminderEmail = async ({ fullName, email, cohortName }) => {
   try {
     const html = `
@@ -245,18 +236,18 @@ export const sendSecondDayReminderEmail = async ({ fullName, email, cohortName }
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #0069AA 0%, #E32726 100%); padding: 30px 40px; text-align: center; position: relative;">
             <img src="${process.env.LOGO_URL}" alt="Digital4africa" style="height: 45px; margin-bottom: 15px; background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">DAY 2: LET’S KEEP GOING!</h1>
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">DAY 2: LET'S KEEP GOING!</h1>
           </div>
 
           <!-- Content -->
           <div style="padding: 20px;">
             <p style="color: #2d3748; font-size: 18px; margin: 0 0 8px; font-weight: 500;">Hi ${fullName},</p>
-            <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">Hope you enjoyed Day 1 of <strong>${cohortName}</strong>! Here’s what’s coming today:</p>
+            <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">Hope you enjoyed Day 1 of <strong>${cohortName}</strong>! Here's what's coming today:</p>
 
             <!-- Topics -->
             <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">
-              <h3 style="color: #0069AA; margin: 0 0 10px;">📚 Today’s Topics</h3>
-              <p style="color: #4a5568; margin: 0;"><a href="#" style="color: #0069AA;">View full list here</a>.</p>
+              <h3 style="color: #0069AA; margin: 0 0 10px;">📚 Today's Topics</h3>
+              <p style="color: #4a5568; margin: 0;">We'll continue with more exciting content today!</p>
             </div>
 
             <!-- Mentorship -->
@@ -265,8 +256,23 @@ export const sendSecondDayReminderEmail = async ({ fullName, email, cohortName }
               <p style="color: #4a5568; margin: 0;">Ask questions anytime for the next month! Reach out to Caleb or Chelsea.</p>
             </div>
 
-            <!-- Socials -->
+            <!-- Tell A Friend -->
+            <div style="margin: 20px 0; padding: 15px; background: #f0fff4; border-radius: 8px; border-left: 4px solid #38a169;">
+              <h3 style="color: #2d3748; margin: 0 0 10px;">📢 Tell A Friend</h3>
+              <p style="color: #4a5568; margin: 0 0 10px;">If you know anyone who's interested in joining this masterclass, please share these links:</p>
+              <p style="color: #4a5568; margin: 0 0 5px;"><a href="https://digital4africa.com/mc/" style="color: #0069AA;">Masterclass Information</a></p>
+              <p style="color: #4a5568; margin: 0;"><a href="https://masterclass.digital4africa.com/" style="color: #0069AA;">Registration for next class</a></p>
+            </div>
+
+            <!-- Google Review -->
             <div style="margin: 20px 0; padding: 15px; background: #fef5e7; border-radius: 8px; border-left: 4px solid #E32726;">
+              <h3 style="color: #2d3748; margin: 0 0 10px;">⭐ Give Us a 5-star Rating</h3>
+              <p style="color: #4a5568; margin: 0 0 10px;">Enjoying the class? Please take a moment to give us a review:</p>
+              <p style="color: #4a5568; margin: 0;"><a href="https://g.page/r/Cey0F9ks65yHEAI/review" style="color: #0069AA;">Leave a Google Review</a></p>
+            </div>
+
+            <!-- Socials -->
+            <div style="margin: 20px 0; padding: 15px; background: #f7fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
               <h3 style="color: #2d3748; margin: 0 0 10px;">📱 Follow Us</h3>
               <p style="color: #4a5568; margin: 0 0 10px;">Stay updated with D4A:</p>
               <a href="https://www.instagram.com/digital4africa/" style="display: inline-block; margin-right: 10px; color: #0069AA;">Instagram</a>
@@ -276,7 +282,7 @@ export const sendSecondDayReminderEmail = async ({ fullName, email, cohortName }
 
             <!-- Footer -->
             <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
-              <p style="color: #718096; font-size: 14px; margin: 0;">Let’s make Day 2 even better!<br><strong>D4A Masterclass Team</strong></p>
+              <p style="color: #718096; font-size: 14px; margin: 0;">Let's make Day 2 even better!<br><strong>D4A Masterclass Team</strong></p>
             </div>
           </div>
         </div>

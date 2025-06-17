@@ -15,12 +15,14 @@ const CheckoutForm = ({ price, cohortId }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phoneNumber: "",
   });
 
   const resetForm = () => {
     setFormData({
       name: "",
       email: "",
+      phoneNumber: "",
     });
     setPaymentType("full");
     setPartialAmount("");
@@ -52,6 +54,7 @@ const CheckoutForm = ({ price, cohortId }) => {
       email: formData.email,
       cohortId,
       amount: amount,
+      phoneNumber: formData.phoneNumber,
     };
 
     try {
@@ -71,6 +74,7 @@ const CheckoutForm = ({ price, cohortId }) => {
               cohortId,
               amount,
               reference,
+              phoneNumber: formData.phoneNumber,
             };
 
             setPaymentData(data);
@@ -122,6 +126,7 @@ const CheckoutForm = ({ price, cohortId }) => {
               className="input-field mt-1"
               value={formData.name}
               onChange={handleInputChange}
+              placeholder="e.g. John Doe"
             />
           </div>
 
@@ -140,6 +145,26 @@ const CheckoutForm = ({ price, cohortId }) => {
               className="input-field mt-1"
               value={formData.email}
               onChange={handleInputChange}
+              placeholder="e.g. john.doe@example.com"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="phoneNumber"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              name="phoneNumber"
+              required
+              className="input-field mt-1"
+              value={formData.phoneNumber}
+              onChange={handleInputChange}
+              placeholder="e.g. +254712345678"
             />
           </div>
         </div>

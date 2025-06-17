@@ -53,18 +53,28 @@ const checkSecondDayReminders = async () => {
 
     const cohorts = await Cohort.find({
       startDate: {
-        $lt: today, // Started before today
-        $gte: yesterday // But not earlier than yesterday
+        $lt: today,
+        $gte: yesterday
       },
       endDate: {
-        $gte: today // Not ended yet
+        $gte: today
       }
     });
 
-    console.log(`Found ${cohorts.length} cohorts on their second day`);
+    console.log(`Found ${cohorts.length} potential second-day cohorts`);
 
     for (const cohort of cohorts) {
-      await sendRemindersForCohort(cohort, 'secondDayReminderSent', sendSecondDayReminderEmail);
+      const needsReminder = cohort.students.some(student => {
+        const notification = cohort.emailNotifications.find(n => n.email === student.email);
+        return !notification || !notification.secondDayReminderSent;
+      });
+
+      if (needsReminder) {
+        console.log(`Processing cohort ${cohort._id} for second-day reminders`);
+        await sendRemindersForCohort(cohort, 'secondDayReminderSent', sendSecondDayReminderEmail);
+      } else {
+        console.log(`Cohort ${cohort._id} already had second-day reminders sent`);
+      }
     }
   } catch (error) {
     console.error('Error in checkSecondDayReminders:', error);
@@ -73,7 +83,7 @@ const checkSecondDayReminders = async () => {
 
 const sendRemindersForCohort = async (cohort, sentFlag, emailSender) => {
   for (const student of cohort.students) {
-    const notification = cohort.emailNotifications.find(n => n.email === student.email);
+    let notification = cohort.emailNotifications.find(n => n.email === student.email);
 
     if (!notification || !notification[sentFlag]) {
       await emailSender({
@@ -86,12 +96,14 @@ const sendRemindersForCohort = async (cohort, sentFlag, emailSender) => {
       if (notification) {
         notification[sentFlag] = true;
       } else {
-        cohort.emailNotifications.push({
+        notification = {
           email: student.email,
-          [sentFlag]: true,
-        });
+          [sentFlag]: true
+        };
+        cohort.emailNotifications.push(notification);
       }
+
+      await cohort.save();
     }
   }
-  await cohort.save();
 };

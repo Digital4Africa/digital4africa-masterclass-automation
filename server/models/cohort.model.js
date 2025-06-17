@@ -27,7 +27,8 @@ const cohortSchema = new mongoose.Schema({
     email: String,
     oneWeekReminderSent: Boolean,
     twoDayReminderSent: Boolean,
-    dayOfReminderSent: Boolean
+    dayOfReminderSent: Boolean,
+    secondDayReminderSent: Boolean
   }],
   students: [studentSubSchema],
   payments: [paymentSubSchema]

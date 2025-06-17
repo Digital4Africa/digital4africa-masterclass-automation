@@ -9,12 +9,40 @@ const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
 export const validateEnrollmentBeforePayment = async (req, res) => {
   try {
-    const { fullName, email, cohortId, amount } = req.body;
+    const { fullName, email, cohortId, amount, phoneNumber } = req.body;
 
-    if (!fullName || !email || !cohortId || amount === undefined) {
+    if (!fullName) {
       return res.status(400).json({
         success: false,
-        message: "Full name, email, amount, and cohortId are required.",
+        message: "Full name is required.",
+      });
+    }
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required.",
+      });
+    }
+
+    if (!cohortId) {
+      return res.status(400).json({
+        success: false,
+        message: "Cohort ID is required.",
+      });
+    }
+
+    if (amount === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: "Amount is required.",
+      });
+    }
+
+    if (!phoneNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "Phone number is required.",
       });
     }
 
@@ -85,9 +113,9 @@ export const enrollStudentAfterPayment = async (req, res) => {
   console.log("ENROLLMENT ATTEMPT", req.body);
 
   try {
-    const { fullName, email, cohortId, amount, reference } = req.body;
+    const { fullName, email, cohortId, amount, reference, phoneNumber } = req.body;
 
-    if (!fullName || !email || !cohortId || !amount || !reference) {
+    if (!fullName || !email || !cohortId || !amount || !reference || !phoneNumber) {
       return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
@@ -114,7 +142,7 @@ export const enrollStudentAfterPayment = async (req, res) => {
           currency: "KES",
           status: "pending",
           channel: "unknown",
-          customer: { email, phone: "" },
+          customer: { email, phone: phoneNumber },
           remarks: "Initiated payment verification",
           cohortId,
         });
@@ -185,7 +213,7 @@ export const enrollStudentAfterPayment = async (req, res) => {
 
     const alreadyStudent = cohort.students.some(s => s.email === email);
     if (!alreadyStudent) {
-      cohort.students.push({ fullName, email });
+      cohort.students.push({ fullName, email, phone:  phoneNumber});
     }
 
     await cohort.save();
@@ -197,10 +225,10 @@ export const enrollStudentAfterPayment = async (req, res) => {
         currency: paystackData.currency,
         status: paystackData.status,
         channel: paystackData.channel,
-        customer: {
-          email: paystackData.customer.email,
-          phone: paystackData.customer.phone || "",
-        },
+        // customer: {
+        //   email: paystackData.customer.email,
+        //   phone: paystackData.customer.phone || "",
+        // },
         remarks: "Payment successful and student enrolled",
       },
       { new: true }
