@@ -1,21 +1,17 @@
-// import { useNavigate } from "react-router-dom";
-import { Edit3, Trash2 } from "lucide-react";
+import { Edit3 } from "lucide-react";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import EditCohortModal from "./EditCohortModal";
 import GiveDiscountModal from "./GiveDiscountModal";
 import Toast from "../Toast";
 import { hideOverlay, showOverlay } from "../../features/overlay/overlaySlice";
-// import { showOverlay, hideOverlay } from "../path/to/your/overlaySlice"; // Update this path
 
 const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
-  
   const [showModal, setShowModal] = useState(false);
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const { allMasterclasses } = useSelector((state) => state.allMasterclasses);
   const dispatch = useDispatch();
 
-  // const navigate = useNavigate();
   const currentDate = new Date();
   const startDate = new Date(cohort.startDate);
   const endDate = new Date(cohort.endDate);
@@ -73,10 +69,16 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
   };
 
   const statusInfo = getStatus();
-  const revenue =
-    cohort.payments?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
-  const totalDiscounts =
-    cohort.discounts?.reduce((sum, discount) => sum + discount.amount, 0) || 0;
+
+  // Calculate total students (count of unique emails in students array)
+  const totalStudents = cohort.students?.length || 0;
+
+  // Calculate total revenue (sum of all payment amounts)
+  const totalRevenue = cohort.payments?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
+
+  // Calculate total discounts (sum of all discount amounts from payments)
+  const totalDiscounts = cohort.payments?.reduce((sum, payment) => sum + (payment.discount || 0), 0) || 0;
+
   const isDisabled = statusInfo.status !== "upcoming";
 
   return (
@@ -95,12 +97,6 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
             >
               <Edit3 size={16} className="text-gray-700 hover:text-blue-600" />
             </button>
-            {/* <button
-              className="bg-white/90 backdrop-blur-sm hover:bg-white p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-              title="Delete cohort"
-            >
-              <Trash2 size={16} className="text-gray-700 hover:text-red-600" />
-            </button> */}
           </div>
         </div>
         <div className="flex-grow"></div>
@@ -121,23 +117,22 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
         <div className="grid grid-cols-3 gap-4 text-center">
           <div className="p-2 bg-gray-50 rounded-lg">
             <div className="text-sm text-gray-500">Students</div>
-            <div className="font-bold">{cohort.students?.length || 0}</div>
+            <div className="font-bold text-sm">{totalStudents}</div>
           </div>
           <div className="p-2 bg-gray-50 rounded-lg">
             <div className="text-sm text-gray-500">Revenue</div>
-            <div className="font-bold">Ksh {revenue}</div>
+            <div className="font-bold text-sm">Ksh {totalRevenue.toLocaleString()}</div>
           </div>
           <div className="p-2 bg-gray-50 rounded-lg">
             <div className="text-sm text-gray-500">Discounts</div>
-            <div className="font-bold">Ksh {totalDiscounts}</div>
+            <div className="font-bold text-sm">Ksh {totalDiscounts.toLocaleString()}</div>
           </div>
         </div>
 
         {/* Actions */}
-        {/* Actions */}
         <div className="flex space-x-3 pt-2">
           <button
-          onClick={() => onCopyLink(cohort._id)}
+            onClick={() => onCopyLink(cohort._id)}
             className={`flex-1 text-sm px-4 py-2 rounded-lg transition-colors ${
               isDisabled
                 ? "bg-gray-200 text-gray-500 cursor-not-allowed"

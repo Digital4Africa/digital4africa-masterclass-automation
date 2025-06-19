@@ -11,6 +11,7 @@ import EditMasterclassForm from '../components/editMasterclass/EditMasterclassFo
 import { useParams } from "react-router-dom";
 import { fetchCohorts } from '../features/cohorts/cohortsSlice';
 import CohortList from '../components/cohortHandler/CohortList';
+import PaymentsPage from './PaymentsPage';
 
 
 
@@ -41,13 +42,50 @@ const AdminPage = () => {
     case `/admin-home/masterclasses/${masterclassId}/edit`:
       ContentComponent = <EditMasterclassForm/>;
       break;
-    default:
+    case '/admin-home/payments':
+      ContentComponent = <PaymentsPage/>;
+      break;
+      default:
       ContentComponent = <div className="text-center p-4">404 - Page Not Found</div>;
       break;
   }
   useEffect(() => {
     dispatch(fetchMasterclasses());
     dispatch(fetchCohorts())
+  }, [dispatch]);
+
+  useEffect(() => {
+    const ws = new WebSocket(import.meta.env.VITE_SOCKET_URL);
+
+    ws.onopen = () => {
+      console.log('✅ Connected to WebSocket server');
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log('📩 Message from server:', data);
+
+      // Handle events
+      if (data.type === 'NEW_COHORT_CREATED') {
+        dispatch(fetchCohorts());
+      }
+
+      if (data.type === 'ENROLLMENT_CONFIRMATION') {
+        dispatch(fetchCohorts());
+      }
+    };
+
+    ws.onclose = () => {
+      console.log('❌ WebSocket connection closed');
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    return () => {
+      ws.close();
+    };
   }, [dispatch]);
 
   return <AdminLayout>{ContentComponent}</AdminLayout>;

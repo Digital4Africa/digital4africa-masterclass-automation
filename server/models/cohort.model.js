@@ -9,6 +9,7 @@ const paymentSubSchema = new mongoose.Schema({
 const studentSubSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   email: { type: String, required: true },
+  phone: { type: String, required: true },
 }, { _id: false });
 
 const cohortSchema = new mongoose.Schema({

@@ -39,7 +39,7 @@ export const sendOneWeekReminderEmail = async ({ fullName, email, cohortName, st
           <!-- Content -->
           <div style="padding: 20px;">
             <p style="color: #2d3748; font-size: 18px; margin: 0 0 8px; font-weight: 500;">Hi ${fullName},</p>
-            <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">It’s just a week to the <strong>${cohortName}</strong>! The class runs on <strong>${formattedStartDate}</strong> from <strong>9:00 AM - 4:00 PM</strong>.</p>
+            <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">It’s just a week to the <strong>${cohortName}</strong>! The class runs on <strong>${formattedStartDate}</strong> from <strong>8:30 AM - 5:00 PM</strong>.</p>
 
             <!-- What to Bring -->
             <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">
@@ -130,7 +130,7 @@ export const sendTwoDayReminderEmail = async ({ fullName, email, cohortName, sta
               <a href="https://g.page/Digital4Africa?share" style="display: inline-block; background: #0069AA; color: #ffffff; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; margin-top: 10px;">View on Google Maps</a>
             </div>
 
-         
+
 
             <!-- Footer -->
             <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
@@ -182,7 +182,7 @@ export const sendDayOfReminderEmail = async ({ fullName, email, cohortName, star
           <!-- Content -->
           <div style="padding: 20px;">
             <p style="color: #2d3748; font-size: 18px; margin: 0 0 8px; font-weight: 500;">Hi ${fullName},</p>
-            <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">Your <strong>${cohortName}</strong> starts today at <strong>9:00 AM</strong>!</p>
+            <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">Your <strong>${cohortName}</strong> starts today at <strong>8:30 AM</strong>!</p>
 
             <!-- WIFI -->
             <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">

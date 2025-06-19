@@ -1,42 +1,65 @@
 import React from 'react';
+import SmartTooltip from '../../utils/SmartTooltip';
 
-const StudentRow = ({ student }) => {
-  const paymentStatusColors = {
-    full: 'bg-green-100 text-green-800',
-    partial: 'bg-yellow-100 text-yellow-800',
-    unpaid: 'bg-red-100 text-red-800'
+const StudentRow = ({ student, paymentStatus, amountPaid, discount, balance }) => {
+  const paymentStatusConfig = {
+    full: {
+      label: 'Paid',
+      className: 'bg-green-100 text-green-800'
+    },
+    partial: {
+      label: 'Partial',
+      className: 'bg-yellow-100 text-yellow-800'
+    },
+    unpaid: {
+      label: 'Unpaid',
+      className: 'bg-red-100 text-red-800'
+    }
   };
+
+  const truncateText = (text, maxLength = 20) => {
+    if (!text || text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+
+  const config = paymentStatusConfig[paymentStatus];
 
   return (
     <tr className="hover:bg-gray-50">
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="flex items-center">
-          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-[var(--d4a-blue)] flex items-center justify-center text-white font-medium">
-            {student.fullName.charAt(0)}
+      <td className="px-4 py-3">
+        <div className="flex items-center space-x-2">
+          <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-medium">
+            {student.fullName.charAt(0).toUpperCase()}
           </div>
-          <div className="ml-4">
-            <div className="text-sm font-medium text-gray-900">{student.fullName}</div>
-          </div>
+          <SmartTooltip content={student.fullName}>
+            <span className="text-sm text-gray-900 font-medium">
+              {truncateText(student.fullName)}
+            </span>
+          </SmartTooltip>
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-gray-900">{student.email}</div>
-        <div className="text-xs text-gray-500">{student.phone}</div>
+      <td className="px-4 py-3">
+        <SmartTooltip content={student.email}>
+          <span className="text-sm text-gray-600">
+            {truncateText(student.email, 25)}
+          </span>
+        </SmartTooltip>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${paymentStatusColors[student.payment.status]}`}>
-          {student.payment.status === 'full' ? 'Paid' :
-           student.payment.status === 'partial' ? 'Partial' : 'Unpaid'}
+      <td className="px-4 py-3">
+        <span className={`px-2 py-1 text-xs font-medium rounded-full ${config.className}`}>
+          {config.label}
         </span>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-        Kes {student.payment.amountPaid}
+      <td className="px-4 py-3 text-sm text-gray-900">
+        {amountPaid.toLocaleString()}
+        {discount > 0 && (
+          <span className="text-xs text-green-600 ml-1">
+            (-{discount.toLocaleString()})
+          </span>
+        )}
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-        {student.payment.discount > 0 ? `-Kes ${student.payment.discount}` : '-'}
-      </td>
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-        Kes {student.payment.total}
+      <td className="px-4 py-3 text-sm text-gray-900">
+        {balance > 0 ? balance.toLocaleString() : '0'}
       </td>
     </tr>
   );

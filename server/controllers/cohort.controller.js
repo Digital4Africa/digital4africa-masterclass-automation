@@ -1,7 +1,7 @@
 import Cohort from '../models/cohort.model.js';
 import Masterclass from '../models/masterclass.model.js';
 import Discount from '../models/discount.model.js';
-
+import { getWSS } from "../config/websockets.js";
 export const createCohort = async (req, res) => {
   try {
     const { title, startDate, endDate } = req.body;
@@ -38,6 +38,15 @@ export const createCohort = async (req, res) => {
 
     await newCohort.save();
 
+    const wss = getWSS();
+    if (wss) {
+      wss.clients.forEach((client) => {
+        if (client.readyState === 1) {
+          client.send(JSON.stringify({ type: 'NEW_COHORT_CREATED' }));
+
+        }
+      });
+    }
     res.status(201).json({
       success: true,
       message: 'Cohort created successfully',

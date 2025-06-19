@@ -1,19 +1,17 @@
 import { useSelector } from "react-redux";
 
 const StatsCards = () => {
-
   const { allCohorts, loading } = useSelector((state) => state.cohorts);
-
+  console.log("allCohorts", allCohorts);
 
   const cohorts = allCohorts || [];
-
 
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
   const currentYear = currentDate.getFullYear();
   const monthStart = new Date(currentYear, currentMonth, 1);
 
-
+  // Filter upcoming and ongoing cohorts
   const upcoming = cohorts.filter((cohort) => {
     const startDate = new Date(cohort.startDate);
     return currentDate < startDate;
@@ -25,17 +23,17 @@ const StatsCards = () => {
     return currentDate >= startDate && currentDate <= endDate;
   }).length;
 
-  const totalActiveMasterclasses = upcoming + ongoing
+  const totalActiveMasterclasses = upcoming + ongoing;
 
-  // Calculate total discounts MTD
+  // Calculate total discounts MTD (sum of all discounts in payments array)
   const totalDiscountsMTD = cohorts.reduce((total, cohort) => {
-    if (cohort.discounts && cohort.discounts.length > 0) {
-      const discountsThisMonth = cohort.discounts.filter((discount) => {
-        const discountDate = new Date(discount.createdAt);
-        return discountDate >= monthStart && discountDate <= currentDate;
+    if (cohort.payments && cohort.payments.length > 0) {
+      const paymentsThisMonth = cohort.payments.filter((payment) => {
+        const paymentDate = new Date(cohort.createdAt); // Using cohort creation date as payment date
+        return paymentDate >= monthStart && paymentDate <= currentDate;
       });
-      const cohortDiscount = discountsThisMonth.reduce(
-        (sum, discount) => sum + discount.amount,
+      const cohortDiscount = paymentsThisMonth.reduce(
+        (sum, payment) => sum + (payment.discount || 0),
         0
       );
       return total + cohortDiscount;
@@ -43,11 +41,17 @@ const StatsCards = () => {
     return total;
   }, 0);
 
-  // Calculate total revenue MTD
+  // Calculate total potential revenue (sum of all cohort prices)
+  const totalPotentialRevenue = cohorts.reduce(
+    (total, cohort) => total + cohort.masterclassPrice,
+    0
+  );
+
+  // Calculate net revenue MTD (sum of all payment amounts)
   const totalRevenueMTD = cohorts.reduce((total, cohort) => {
     if (cohort.payments && cohort.payments.length > 0) {
       const paymentsThisMonth = cohort.payments.filter((payment) => {
-        const paymentDate = new Date(payment.createdAt);
+        const paymentDate = new Date(cohort.createdAt); // Using cohort creation date as payment date
         return paymentDate >= monthStart && paymentDate <= currentDate;
       });
       const cohortRevenue = paymentsThisMonth.reduce(
@@ -59,7 +63,7 @@ const StatsCards = () => {
     return total;
   }, 0);
 
-  const netRevenueMTD = totalRevenueMTD - totalDiscountsMTD;
+  const netRevenueMTD = totalRevenueMTD;
 
   // Loading spinner component
   const LoadingSpinner = () => (

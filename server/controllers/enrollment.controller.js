@@ -4,6 +4,7 @@ import Payment from "../models/payment.model.js";
 import axios from "axios";
 import { sendReceiptEmail } from "../utils/sendReciept.js";
 import { sendEnrollmentConfirmationEmail } from "../utils/sendWelcomeEmail.js";
+import { getWSS } from "../config/websockets.js";
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
@@ -259,7 +260,14 @@ export const enrollStudentAfterPayment = async (req, res) => {
       });
     }
 
-
+    const wss = getWSS();
+    if (wss) {
+      wss.clients.forEach((client) => {
+        if (client.readyState === 1) {
+          client.send(JSON.stringify({ type: 'ENROLLMENT_CONFIRMATION' }));
+        }
+      });
+    }
     return res.status(200).json({
       success: true,
       message: "Payment verified and student enrolled",
@@ -272,9 +280,76 @@ export const enrollStudentAfterPayment = async (req, res) => {
     });
 
   } catch (error) {
+    console.log("error while enrolling student: ", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
+    });
+  }
+};
+
+export const getPayments = async (req, res) => {
+  try {
+    // Parse query parameters
+    const page = parseInt(req.query.page) || 1;
+    const limitParam = req.query.limit;
+    const { fromDate, toDate, status } = req.query;
+
+    // Handle 'all' records case
+    const isAll = limitParam === 'all';
+    const limit = isAll ? null : parseInt(limitParam) || 10;
+    const skip = isAll ? null : (page - 1) * limit;
+
+    // Build filter object
+    const filter = {};
+
+    // Date range filter
+    if (fromDate && toDate) {
+      filter.createdAt = {
+        $gte: new Date(fromDate),
+        $lte: new Date(toDate)
+      };
+    }
+
+    // Status filter (if provided and not 'all')
+    if (status && status !== 'all') {
+      filter.status = status;
+    }
+
+    // Get total count of documents (for pagination meta)
+    const totalItems = await Payment.countDocuments(filter);
+
+    // Build query
+    let query = Payment.find(filter)
+      .sort({ createdAt: -1 }); // Newest first
+
+    // Apply pagination if not fetching all records
+    if (!isAll) {
+      query = query.skip(skip).limit(limit);
+    }
+
+    // Execute query
+    const payments = await query.exec();
+
+    // Prepare response
+    const response = {
+      success: true,
+      message: 'Payments fetched successfully',
+      data: payments,
+      meta: {
+        totalItems,
+        currentPage: page,
+        totalPages: isAll ? 1 : Math.ceil(totalItems / limit)
+      }
+    };
+
+    return res.status(200).json(response);
+
+  } catch (error) {
+    console.error('Error fetching payments:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error while fetching payment records'
     });
   }
 };

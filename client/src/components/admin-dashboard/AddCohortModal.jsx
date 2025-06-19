@@ -23,13 +23,13 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
     return () => dispatch(hideOverlay());
   }, [dispatch]);
 
-  // Helper function to set time to 9 AM or 5 PM EAT (UTC+3)
-  const setTimeForEAT = (dateString, hoursEAT) => {
+  // Helper function to set time to 8:30 AM or 5 PM EAT (UTC+3)
+  const setTimeForEAT = (dateString, hoursEAT, minutesEAT = 0) => {
     if (!dateString) return null;
     const date = new Date(dateString);
     // Convert EAT hours to UTC (EAT is UTC+3)
     const hoursUTC = (hoursEAT + 24 - 3) % 24; // Handle timezone conversion
-    date.setUTCHours(hoursUTC, 0, 0, 0);
+    date.setUTCHours(hoursUTC, minutesEAT, 0, 0);
     return date.toISOString();
   };
 
@@ -45,9 +45,9 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
       return;
     }
 
-    // Set fixed times (9 AM and 5 PM East Africa Time)
-    const startWithTime = setTimeForEAT(startDate, 9); // 9 AM EAT (6 AM UTC)
-    const endWithTime = setTimeForEAT(endDate, 17);    // 5 PM EAT (2 PM UTC)
+    // Set fixed times (8:30 AM and 5 PM East Africa Time)
+    const startWithTime = setTimeForEAT(startDate, 8, 30); // 8:30 AM EAT (5:30 AM UTC)
+    const endWithTime = setTimeForEAT(endDate, 17);       // 5 PM EAT (2 PM UTC)
 
     if (new Date(startWithTime) >= new Date(endWithTime)) {
       setToast({

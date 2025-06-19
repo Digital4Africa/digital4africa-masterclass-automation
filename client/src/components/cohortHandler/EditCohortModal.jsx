@@ -23,11 +23,19 @@ const EditCohortModal = ({ onClose, masterclasses, cohort }) => {
     return () => dispatch(hideOverlay());
   }, [dispatch]);
 
+  // Helper function to set time to 8:30 AM or 5 PM EAT (UTC+3)
+  const setTimeForEAT = (dateString, hoursEAT, minutesEAT = 0) => {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    // Convert EAT hours to UTC (EAT is UTC+3)
+    const hoursUTC = (hoursEAT + 24 - 3) % 24; // Handle timezone conversion
+    date.setUTCHours(hoursUTC, minutesEAT, 0, 0);
+    return date.toISOString();
+  };
+
   useEffect(() => {
     if (cohort) {
-		console.log(cohort);
-      const matching = masterclasses.find((m) => m.title === cohort.masterclassTitle
-);
+      const matching = masterclasses.find((m) => m.title === cohort.masterclassTitle);
       setSelectedMasterclass(matching?._id || "");
       setStartDate(cohort.startDate?.substring(0, 10) || "");
       setEndDate(cohort.endDate?.substring(0, 10) || "");
@@ -35,69 +43,69 @@ const EditCohortModal = ({ onClose, masterclasses, cohort }) => {
   }, [cohort, masterclasses]);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!selectedMasterclass || !startDate || !endDate) {
-    setToast({
-      isVisible: true,
-      message: "Please fill all fields",
-      type: "error",
-    });
-    return;
-  }
+    if (!selectedMasterclass || !startDate || !endDate) {
+      setToast({
+        isVisible: true,
+        message: "Please fill all fields",
+        type: "error",
+      });
+      return;
+    }
 
-  if (new Date(startDate) > new Date(endDate)) {
-    setToast({
-      isVisible: true,
-      message: "End date must be after start date",
-      type: "error",
-    });
-    return;
-  }
+    // Set fixed times (8:30 AM and 5 PM East Africa Time)
+    const startWithTime = setTimeForEAT(startDate, 8, 30); // 8:30 AM EAT (5:30 AM UTC)
+    const endWithTime = setTimeForEAT(endDate, 17);       // 5 PM EAT (2 PM UTC)
 
-  setIsSubmitting(true);
-  dispatch(showOverlay());
+    if (new Date(startWithTime) >= new Date(endWithTime)) {
+      setToast({
+        isVisible: true,
+        message: "End date must be after start date",
+        type: "error",
+      });
+      return;
+    }
 
-  const formDataToSend = {
-    cohortId: cohort._id,
-    masterclassId: selectedMasterclass,
-    startDate,
-    endDate,
+    setIsSubmitting(true);
+    dispatch(showOverlay());
+
+    try {
+      await axios.put(
+        `${apiUrl}/api/v1/cohort/update`,
+        {
+          cohortId: cohort._id,
+          masterclassId: selectedMasterclass,
+          startDate: startWithTime,
+          endDate: endWithTime,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      setToast({
+        isVisible: true,
+        message: "Cohort updated successfully!",
+        type: "success",
+      });
+
+      setTimeout(() => {
+        onClose();
+        dispatch(hideOverlay());
+        dispatch(fetchCohorts());
+      }, 1500);
+    } catch (error) {
+      console.error(error);
+      setToast({
+        isVisible: true,
+        message: error.response?.data?.message || "Error updating cohort",
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
-  try {
-    await axios.put(
-      `${apiUrl}/api/v1/cohort/update`,
-      formDataToSend,
-      {
-        withCredentials: true,
-      }
-    );
-
-    setToast({
-      isVisible: true,
-      message: "Cohort updated successfully!",
-      type: "success",
-    });
-
-    setTimeout(() => {
-      onClose();
-      dispatch(hideOverlay());
-      dispatch(fetchCohorts());
-    }, 1500);
-  } catch (error) {
-    console.error(error);
-    setToast({
-      isVisible: true,
-      message: "Error updating cohort",
-      type: "error",
-    });
-
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
 
   return (
     <>
