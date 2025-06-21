@@ -214,7 +214,7 @@ export const enrollStudentAfterPayment = async (req, res) => {
 
     const alreadyStudent = cohort.students.some(s => s.email === email);
     if (!alreadyStudent) {
-      cohort.students.push({ fullName, email, phone:  phoneNumber});
+      cohort.students.push({ fullName, email, phone: phoneNumber });
     }
 
     await cohort.save();
@@ -239,27 +239,35 @@ export const enrollStudentAfterPayment = async (req, res) => {
     const totalFinalPay = updatedPayRecord.amount + (updatedPayRecord.discount || 0);
     const balance = cohort.masterclassPrice - totalFinalPay;
 
-    await sendReceiptEmail({
-      fullName,
-      startDate: cohort.startDate,
-      email,
-      reference,
-      amountPaid: updatedPayRecord.amount,
-      totalPrice: cohort.masterclassPrice,
-      cohortName: cohort.masterclassTitle,
-      balanceRemaining: balance,
-      discount: updatedPayRecord.discount,
-    });
+    // Fire-and-forget emails (run in background)
+    Promise.resolve()
+      .then(async () => {
+        await sendReceiptEmail({
+          fullName,
+          startDate: cohort.startDate,
+          email,
+          reference,
+          amountPaid: updatedPayRecord.amount,
+          totalPrice: cohort.masterclassPrice,
+          cohortName: cohort.masterclassTitle,
+          balanceRemaining: balance,
+          discount: updatedPayRecord.discount,
+        });
 
-    if (balance <= 0) {
-      await sendEnrollmentConfirmationEmail({
-        fullName,
-        email,
-        cohortName: cohort.masterclassTitle,
-        startDate: cohort.startDate,
+        if (balance <= 0) {
+          await sendEnrollmentConfirmationEmail({
+            fullName,
+            email,
+            cohortName: cohort.masterclassTitle,
+            startDate: cohort.startDate,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("⚠️ Background email error:", err.message);
       });
-    }
 
+    // Keep WebSocket notification in main flow (it's fast)
     const wss = getWSS();
     if (wss) {
       wss.clients.forEach((client) => {
@@ -268,6 +276,8 @@ export const enrollStudentAfterPayment = async (req, res) => {
         }
       });
     }
+
+    // Immediate response
     return res.status(200).json({
       success: true,
       message: "Payment verified and student enrolled",
