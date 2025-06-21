@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 
 const StatsCards = () => {
   const { allCohorts, loading } = useSelector((state) => state.cohorts);
-  console.log("allCohorts", allCohorts);
+  
 
   const cohorts = allCohorts || [];
 

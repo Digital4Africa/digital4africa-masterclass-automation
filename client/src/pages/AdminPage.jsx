@@ -63,7 +63,7 @@ const AdminPage = () => {
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log('📩 Message from server:', data);
+      // console.log('📩 Message from server:', data);
 
       // Handle events
       if (data.type === 'NEW_COHORT_CREATED') {

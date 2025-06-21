@@ -21,27 +21,18 @@ export const sendOneWeekReminderEmail = async ({ fullName, email, cohortName, st
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>One Week Reminder</title>
-        <style type="text/css">
-          @media only screen and (max-width: 600px) {
-            body { padding: 0 !important; }
-            .email-container { max-width: 100% !important; }
-          }
-        </style>
       </head>
-      <body style="margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-        <div class="email-container" style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
-          <!-- Header -->
+      <body style="margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        <div class="email-container" style="width: 100%; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
           <div style="background: linear-gradient(135deg, #0069AA 0%, #E32726 100%); padding: 30px 40px; text-align: center; position: relative;">
             <img src="${process.env.LOGO_URL}" alt="Digital4africa" style="height: 45px; margin-bottom: 15px; background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
             <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">ONE WEEK TO GO!</h1>
           </div>
 
-          <!-- Content -->
           <div style="padding: 20px;">
             <p style="color: #2d3748; font-size: 18px; margin: 0 0 8px; font-weight: 500;">Hi ${fullName},</p>
-            <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">It’s just a week to the <strong>${cohortName}</strong>! The class runs on <strong>${formattedStartDate}</strong> from <strong>8:30 AM - 5:00 PM</strong>.</p>
+            <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">It's just a week to the <strong>${cohortName}</strong>! The class runs on <strong>${formattedStartDate}</strong> from <strong>8:30 AM - 5:00 PM</strong>.</p>
 
-            <!-- What to Bring -->
             <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">
               <h3 style="color: #0069AA; margin: 0 0 10px;">📝 What to Bring</h3>
               <ul style="color: #4a5568; margin: 0; padding-left: 20px;">
@@ -51,22 +42,19 @@ export const sendOneWeekReminderEmail = async ({ fullName, email, cohortName, st
               </ul>
             </div>
 
-            <!-- Directions -->
             <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">
               <h3 style="color: #0069AA; margin: 0 0 10px;">📍 Location</h3>
               <p style="color: #4a5568; margin: 0 0 10px;"><strong>Digital 4 Africa Office</strong><br>Delta Corner Annex, 4th Floor<br>Opposite Westlands Stage, Waiyaki Way</p>
               <a href="https://g.page/Digital4Africa?share" style="display: inline-block; background: #0069AA; color: #ffffff; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; margin-top: 10px;">View on Google Maps</a>
             </div>
 
-            <!-- Parking -->
             <div style="margin: 20px 0; padding: 15px; background: #ebf8ff; border-radius: 8px; border-left: 4px solid #0069AA;">
               <h3 style="color: #2d3748; margin: 0 0 10px;">🚗 Parking Instructions</h3>
               <p style="color: #4a5568; margin: 0;">Ask guards to direct you to <strong>Nairobi Garage Parking</strong> on Floor P1. Visitors' parking is to your left after the barrier.</p>
             </div>
 
-            <!-- Footer -->
             <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
-              <p style="color: #718096; font-size: 14px; margin: 0;">We can’t wait to see you there!<br><strong>D4A Masterclass Team</strong></p>
+              <p style="color: #718096; font-size: 14px; margin: 0;">We can't wait to see you there!<br><strong>D4A Masterclass Team</strong></p>
             </div>
           </div>
         </div>
@@ -103,36 +91,24 @@ export const sendTwoDayReminderEmail = async ({ fullName, email, cohortName, sta
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Two Day Reminder</title>
-        <style type="text/css">
-          @media only screen and (max-width: 600px) {
-            body { padding: 0 !important; }
-            .email-container { max-width: 100% !important; }
-          }
-        </style>
       </head>
-      <body style="margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-        <div class="email-container" style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
-          <!-- Header -->
+      <body style="margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        <div class="email-container" style="width: 100%; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
           <div style="background: linear-gradient(135deg, #0069AA 0%, #E32726 100%); padding: 30px 40px; text-align: center; position: relative;">
             <img src="${process.env.LOGO_URL}" alt="Digital4africa" style="height: 45px; margin-bottom: 15px; background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
             <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">REMINDER: CLASS STARTS SOON!</h1>
           </div>
 
-          <!-- Content -->
           <div style="padding: 20px;">
             <p style="color: #2d3748; font-size: 18px; margin: 0 0 8px; font-weight: 500;">Hi ${fullName},</p>
             <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">Less than 48 hours until <strong>${cohortName}</strong>! Please arrive by <strong>8:30 AM</strong> on <strong>${formattedStartDate}</strong>.</p>
 
-            <!-- Directions -->
             <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">
               <h3 style="color: #0069AA; margin: 0 0 10px;">📍 Location</h3>
               <p style="color: #4a5568; margin: 0 0 10px;"><strong>Delta Corner Annex, 4th Floor</strong><br>Opposite Westlands Stage, Waiyaki Way<br>(Building with BMW Centre & PWC)</p>
               <a href="https://g.page/Digital4Africa?share" style="display: inline-block; background: #0069AA; color: #ffffff; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; margin-top: 10px;">View on Google Maps</a>
             </div>
 
-
-
-            <!-- Footer -->
             <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
               <p style="color: #718096; font-size: 14px; margin: 0;">See you soon!<br><strong>D4A Masterclass Team</strong></p>
             </div>
@@ -164,37 +140,25 @@ export const sendDayOfReminderEmail = async ({ fullName, email, cohortName, star
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Day Of Reminder</title>
-        <style type="text/css">
-          @media only screen and (max-width: 600px) {
-            body { padding: 0 !important; }
-            .email-container { max-width: 100% !important; }
-          }
-        </style>
       </head>
-      <body style="margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-        <div class="email-container" style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
-          <!-- Header -->
+      <body style="margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        <div class="email-container" style="width: 100%; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
           <div style="background: linear-gradient(135deg, #0069AA 0%, #E32726 100%); padding: 30px 40px; text-align: center; position: relative;">
             <img src="${process.env.LOGO_URL}" alt="Digital4africa" style="height: 45px; margin-bottom: 15px; background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
             <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">TODAY'S THE DAY!</h1>
           </div>
 
-          <!-- Content -->
           <div style="padding: 20px;">
             <p style="color: #2d3748; font-size: 18px; margin: 0 0 8px; font-weight: 500;">Hi ${fullName},</p>
             <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">Your <strong>${cohortName}</strong> starts today at <strong>8:30 AM</strong>!</p>
 
-            <!-- WIFI -->
             <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">
               <h3 style="color: #0069AA; margin: 0 0 10px;">📶 WIFI Access</h3>
               <p style="color: #4a5568; margin: 0;"><strong>Network:</strong> Nairobi Garage<br><strong>Password:</strong> COWORK@NG</p>
             </div>
 
-
-
-            <!-- Footer -->
             <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
-              <p style="color: #718096; font-size: 14px; margin: 0;">Let’s make today amazing!<br><strong>D4A Masterclass Team</strong></p>
+              <p style="color: #718096; font-size: 14px; margin: 0;">Let's make today amazing!<br><strong>D4A Masterclass Team</strong></p>
             </div>
           </div>
         </div>
@@ -224,39 +188,28 @@ export const sendSecondDayReminderEmail = async ({ fullName, email, cohortName }
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Second Day Reminder</title>
-        <style type="text/css">
-          @media only screen and (max-width: 600px) {
-            body { padding: 0 !important; }
-            .email-container { max-width: 100% !important; }
-          }
-        </style>
       </head>
-      <body style="margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-        <div class="email-container" style="max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
-          <!-- Header -->
+      <body style="margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        <div class="email-container" style="width: 100%; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
           <div style="background: linear-gradient(135deg, #0069AA 0%, #E32726 100%); padding: 30px 40px; text-align: center; position: relative;">
             <img src="${process.env.LOGO_URL}" alt="Digital4africa" style="height: 45px; margin-bottom: 15px; background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
             <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">DAY 2: LET'S KEEP GOING!</h1>
           </div>
 
-          <!-- Content -->
           <div style="padding: 20px;">
             <p style="color: #2d3748; font-size: 18px; margin: 0 0 8px; font-weight: 500;">Hi ${fullName},</p>
             <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.5;">Hope you enjoyed Day 1 of <strong>${cohortName}</strong>! Here's what's coming today:</p>
 
-            <!-- Topics -->
             <div style="margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 8px;">
               <h3 style="color: #0069AA; margin: 0 0 10px;">📚 Today's Topics</h3>
               <p style="color: #4a5568; margin: 0;">We'll continue with more exciting content today!</p>
             </div>
 
-            <!-- Mentorship -->
             <div style="margin: 20px 0; padding: 15px; background: #ebf8ff; border-radius: 8px; border-left: 4px solid #0069AA;">
               <h3 style="color: #2d3748; margin: 0 0 10px;">🎓 Free 30-Day Mentorship</h3>
               <p style="color: #4a5568; margin: 0;">Ask questions anytime for the next month! Reach out to Caleb or Chelsea.</p>
             </div>
 
-            <!-- Tell A Friend -->
             <div style="margin: 20px 0; padding: 15px; background: #f0fff4; border-radius: 8px; border-left: 4px solid #38a169;">
               <h3 style="color: #2d3748; margin: 0 0 10px;">📢 Tell A Friend</h3>
               <p style="color: #4a5568; margin: 0 0 10px;">If you know anyone who's interested in joining this masterclass, please share these links:</p>
@@ -264,14 +217,12 @@ export const sendSecondDayReminderEmail = async ({ fullName, email, cohortName }
               <p style="color: #4a5568; margin: 0;"><a href="https://masterclass.digital4africa.com/" style="color: #0069AA;">Registration for next class</a></p>
             </div>
 
-            <!-- Google Review -->
             <div style="margin: 20px 0; padding: 15px; background: #fef5e7; border-radius: 8px; border-left: 4px solid #E32726;">
               <h3 style="color: #2d3748; margin: 0 0 10px;">⭐ Give Us a 5-star Rating</h3>
               <p style="color: #4a5568; margin: 0 0 10px;">Enjoying the class? Please take a moment to give us a review:</p>
               <p style="color: #4a5568; margin: 0;"><a href="https://g.page/r/Cey0F9ks65yHEAI/review" style="color: #0069AA;">Leave a Google Review</a></p>
             </div>
 
-            <!-- Socials -->
             <div style="margin: 20px 0; padding: 15px; background: #f7fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
               <h3 style="color: #2d3748; margin: 0 0 10px;">📱 Follow Us</h3>
               <p style="color: #4a5568; margin: 0 0 10px;">Stay updated with D4A:</p>
@@ -280,7 +231,6 @@ export const sendSecondDayReminderEmail = async ({ fullName, email, cohortName }
               <a href="https://x.com/Digital4Africa" style="display: inline-block; color: #0069AA;">X</a>
             </div>
 
-            <!-- Footer -->
             <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
               <p style="color: #718096; font-size: 14px; margin: 0;">Let's make Day 2 even better!<br><strong>D4A Masterclass Team</strong></p>
             </div>

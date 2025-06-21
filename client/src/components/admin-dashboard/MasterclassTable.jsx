@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 
 const MasterclassTable = () => {
   const { allMasterclasses } = useSelector((state) => state.allMasterclasses);
-  console.log("AvailableMasterclass: ", allMasterclasses);
+  
   const masterclasses = (allMasterclasses || []).map((m) => {
     const now = new Date();
     const start = new Date(m.startDate);
