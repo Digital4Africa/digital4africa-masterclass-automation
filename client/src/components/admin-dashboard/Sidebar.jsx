@@ -20,8 +20,8 @@ const Sidebar = ({ isOpen }) => {
     { name: "Masterclasses", icon: "🎓", path: "/admin-home/masterclasses" },
     { name: "Students", icon: "👥", path: "/admin-home/students" },
     { name: "Payments", icon: "💳", path: "/admin-home/payments" },
-    { name: "Communications", icon: "✉️", path: "/admin-home/communications" },
-    { name: "Settings", icon: "⚙️", path: "/admin-home/settings" },
+    // { name: "Communications", icon: "✉️", path: "/admin-home/communications" },
+    // { name: "Settings", icon: "⚙️", path: "/admin-home/settings" },
   ];
 
   const showToast = (message, type) => {

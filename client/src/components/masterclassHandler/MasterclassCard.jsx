@@ -105,7 +105,7 @@ const MasterclassCard = ({ masterclass }) => {
         </p>
 
         {/* Price */}
-        <div className="flex items-center text-sm text-gray-600">
+        <div className="flex items-center text-sm text-[var(--d4a-red)]">
           <svg
             className="w-4 h-4 mr-2 flex-shrink-0"
             fill="none"

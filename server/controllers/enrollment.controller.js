@@ -111,7 +111,7 @@ export const validateEnrollmentBeforePayment = async (req, res) => {
 
 export const enrollStudentAfterPayment = async (req, res) => {
 
-  console.log("ENROLLMENT ATTEMPT", req.body);
+
 
   try {
     const { fullName, email, cohortId, amount, reference, phoneNumber } = req.body;

@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 
 const StatsCards = () => {
   const { allCohorts, loading } = useSelector((state) => state.cohorts);
-  
+
 
   const cohorts = allCohorts || [];
 
@@ -112,10 +112,10 @@ const StatsCards = () => {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-[var(--d4a-black)]">
+              <p className="text-sm font-semibold text-[var(--d4a-blue)]">
                 {stat.title}
               </p>
-              <div className="text-l font-bold text-[var(--d4a-blue)]">
+              <div className="text-l font-bold text-[var(--d4a-black)]">
                 {stat.value}
               </div>
             </div>

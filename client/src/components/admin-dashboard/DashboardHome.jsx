@@ -15,7 +15,7 @@ const DashboardHome = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-[var(--d4a-black)]">
+      <h1 className="text-2xl font-bold text-[var(--d4a-blue)]">
         Dashboard Overview
       </h1>
 
@@ -25,12 +25,12 @@ const DashboardHome = () => {
       {/* Recent Cohorts */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-l font-semibold text-[var(--d4a-black)]">
+          <h2 className="text-l font-semibold text-[var(--d4a-red)]">
             Recent Cohorts
           </h2>
           <button
             onClick={() => setShowModal(true)}
-            className="btn-primary text-sm px-4 py-2"
+            className="btn-secondary text-sm px-4 py-2"
           >
             + New Cohort
           </button>

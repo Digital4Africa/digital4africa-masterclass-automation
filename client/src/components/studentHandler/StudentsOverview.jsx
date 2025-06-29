@@ -93,7 +93,7 @@ const StudentsOverview = () => {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
                             <SmartTooltip content={cohort.masterclassTitle}>
-                              <h3 className="text-sm font-semibold text-gray-900">
+                              <h3 className="text-sm font-semibold text-[var(--d4a-red)]">
                                 {truncateText(cohort.masterclassTitle, 50)}
                               </h3>
                             </SmartTooltip>
@@ -101,7 +101,7 @@ const StudentsOverview = () => {
                               {status.text}
                             </span>
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-[var(--d4a-red)]">
                             {format(new Date(cohort.startDate), 'MMM d')} - {format(new Date(cohort.endDate), 'MMM d, yyyy')} |
                             Price: Kes {cohort.masterclassPrice?.toLocaleString()}
                           </div>

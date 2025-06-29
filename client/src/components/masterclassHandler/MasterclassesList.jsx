@@ -33,7 +33,7 @@ const MasterclassesList = () => {
           Masterclasses
         </h1>
         <button
-          className="btn-primary flex items-center"
+          className="btn-secondary flex items-center"
           onClick={() => navigate("/admin-home/masterclasses/new")}
         >
           <svg
@@ -58,7 +58,7 @@ const MasterclassesList = () => {
           <MasterclassCard
             key={masterclass._id}
             masterclass={masterclass}
-            
+
             onCopyLink={copyCheckoutLink}
             toast={toast}
             closeToast={closeToast}
