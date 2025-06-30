@@ -18,6 +18,7 @@ export const appRoutes = [
 	{ path: "/admin-home/students", component: AdminHomePage, requireAuth: true },
 	{ path: "/admin-home/masterclasses/new", component: AdminHomePage, requireAuth: true },
 	{ path: "/admin-home/masterclasses/:masterclassId/edit", component: AdminHomePage, requireAuth: true },
+	{ path: "/admin-home/direct-enroll", component: AdminHomePage, requireAuth: true },
 	{ path: "/admin-home/payments", component: AdminHomePage, requireAuth: true },
 
 	{path: "*", component: NotFound}

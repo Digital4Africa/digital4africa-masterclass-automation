@@ -12,6 +12,7 @@ import { useParams } from "react-router-dom";
 import { fetchCohorts } from '../features/cohorts/cohortsSlice';
 import CohortList from '../components/cohortHandler/CohortList';
 import PaymentsPage from './PaymentsPage';
+import DirectEnrollment from './DirectEnrollment';
 
 
 
@@ -44,6 +45,9 @@ const AdminPage = () => {
       break;
     case '/admin-home/payments':
       ContentComponent = <PaymentsPage/>;
+      break;
+    case '/admin-home/direct-enroll':
+      ContentComponent = <DirectEnrollment/>;
       break;
       default:
       ContentComponent = <div className="text-center p-4">404 - Page Not Found</div>;

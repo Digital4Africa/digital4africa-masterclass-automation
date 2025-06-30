@@ -31,7 +31,8 @@ const paymentSchema = new mongoose.Schema(
         "bank_transfer",
         "eft",
         "unknown",
-        "simulated"
+        "simulated",
+        "direct"
       ],
       default: "unknown",
     },
