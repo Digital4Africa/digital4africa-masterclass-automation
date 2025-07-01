@@ -3,8 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
 
   isAuthenticated: false,
- 
-  user:null
+
+  admin:null
 };
 
 const authorizationSlice = createSlice({
@@ -16,11 +16,11 @@ const authorizationSlice = createSlice({
       state.isAuthenticated = action.payload;
     },
 
-    setUser: (state, action) => {
-      state.user = action.payload
+    setAdmin: (state, action) => {
+      state.admin = action.payload
     },
-    unsetUser: (state) => {
-      state.user = null
+    unsetAdmin: (state) => {
+      state.admin = null
     }
   },
 });
@@ -29,8 +29,8 @@ export const {
 
   setIsAuthenticated,
 
-  setUser,
-  unsetUser
+  setAdmin,
+  unsetAdmin
 } = authorizationSlice.actions;
 
 export default authorizationSlice.reducer;

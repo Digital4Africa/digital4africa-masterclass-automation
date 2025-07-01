@@ -10,7 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { appRoutes } from "./appRoutes";
 import { hideOverlay, showOverlay } from "./features/overlay/overlaySlice";
-import { setIsAuthenticated, unsetUser } from "./features/auth/authSlice";
+import { setAdmin, setIsAuthenticated, unsetAdmin } from "./features/auth/authSlice";
 import Toast from "./components/Toast";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
@@ -18,9 +18,12 @@ import { fetchStudentsCohorts } from "./features/cohorts/cohortsSliceStudentsDet
 import Overlay from "./components/Overlay";
 const apiUrl = import.meta.env.VITE_API_URL;
 
+
 function App() {
   const dispatch = useDispatch();
-  const { isAuthenticated } = useSelector((state) => state.authorization);
+  const { isAuthenticated, admin } = useSelector((state) => state.authorization);
+  console.log("admin", admin)
+
   const [loading, setLoading] = useState(true);
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [countdown, setCountdown] = useState(30);
@@ -56,6 +59,7 @@ function App() {
         // Update admin data if provided
         if (admin) {
           localStorage.setItem("d4aAdmin", JSON.stringify(admin));
+          dispatch(setAdmin(admin));
         }
 
         return true;
@@ -86,7 +90,7 @@ function App() {
     localStorage.removeItem("Tr9kLmXzQ");
     localStorage.removeItem("d4aAdmin");
     dispatch(setIsAuthenticated(false));
-    dispatch(unsetUser());
+    dispatch(unsetAdmin());
     setShowSessionModal(false);
     setSessionExpired(true);
     dispatch(hideOverlay());
@@ -147,6 +151,10 @@ function App() {
 
         if (decoded.exp > now) {
           dispatch(setIsAuthenticated(true));
+          const adminData = localStorage.getItem("d4aAdmin");
+          if (adminData) {
+            dispatch(setAdmin(JSON.parse(adminData)));
+          }
         } else {
           handleSessionExpired();
         }
@@ -158,7 +166,7 @@ function App() {
       }
     } else {
       dispatch(setIsAuthenticated(false));
-      dispatch(unsetUser());
+      dispatch(unsetAdmin());
       setLoading(false);
     }
   }, [dispatch]);
@@ -202,7 +210,7 @@ function App() {
 
   return (
     <div>
-      
+
       <Suspense
         fallback={
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 z-50">

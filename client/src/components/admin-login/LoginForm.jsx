@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import loginAdmin from '../../utils/loginAdmin';
 import Toast from '../Toast'; // Adjust path as needed
-import { setIsAuthenticated } from '../../features/auth/authSlice';
+import { setAdmin, setIsAuthenticated } from '../../features/auth/authSlice';
 import { useDispatch } from 'react-redux';
 
 const LoginForm = () => {
@@ -32,6 +32,8 @@ const LoginForm = () => {
       if (loginResult.success) {
         showToast('Login successful!', 'success');
         dispatch(setIsAuthenticated(true));
+
+        dispatch(setAdmin(loginResult.data.admin));
 
         // Give Redux state time to update before navigation
         setTimeout(() => {

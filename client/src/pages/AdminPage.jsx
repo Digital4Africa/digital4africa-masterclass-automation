@@ -75,7 +75,13 @@ const AdminPage = () => {
       }
 
       if (data.type === 'ENROLLMENT_CONFIRMATION') {
-        dispatch(fetchCohorts());
+        if (data.isDirect) {
+          // For direct enrollments, wait 3 seconds before refreshing
+          setTimeout(() => dispatch(fetchCohorts()), 3000);
+        } else {
+          // For normal enrollments, refresh immediately
+          dispatch(fetchCohorts());
+        }
       }
     };
 

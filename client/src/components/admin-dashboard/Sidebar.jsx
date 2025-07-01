@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import Toast from "../Toast"; // Adjust path as needed
 import { logoutAdmin } from "../../utils/logoutAdmin";
 import { useDispatch } from "react-redux";
-import { setIsAuthenticated, unsetUser } from "../../features/auth/authSlice";
+import { setIsAuthenticated, unsetAdmin } from "../../features/auth/authSlice";
 
 const Sidebar = ({ isOpen }) => {
   const [toast, setToast] = useState({
@@ -43,7 +43,7 @@ const Sidebar = ({ isOpen }) => {
       setTimeout(() => {
         dispatch(setIsAuthenticated(false));
         navigate("/admin-067", { replace: true });
-        dispatch(unsetUser());
+        dispatch(unsetAdmin());
       }, 1500); // 1.5s delay (adjust to match your Toast duration)
     } else {
       showToast("Logout failed. Please try again.", "error");

@@ -236,7 +236,7 @@ export const enrollStudentAfterPayment = async (req, res) => {
     if (wss) {
       wss.clients.forEach((client) => {
         if (client.readyState === 1) {
-          client.send(JSON.stringify({ type: 'ENROLLMENT_CONFIRMATION' }));
+          client.send(JSON.stringify({ type: 'ENROLLMENT_CONFIRMATION', isDirect: isDirect  }));
         }
       });
     }

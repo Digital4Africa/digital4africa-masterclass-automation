@@ -1,5 +1,5 @@
 import axios from "axios";
-import { unsetUser } from "../features/auth/authSlice";
+import { unsetAdmin } from "../features/auth/authSlice";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -12,7 +12,7 @@ export const logoutAdmin = async (dispatch) => {
 
     localStorage.removeItem("Tr9kLmXzQ");
     localStorage.removeItem("d4aAdmin");
-	dispatch(unsetUser());
+	dispatch(unsetAdmin());
 
     return true;
   } catch (error) {
