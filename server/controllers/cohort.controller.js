@@ -4,7 +4,7 @@ import Discount from '../models/discount.model.js';
 import { getWSS } from "../config/websockets.js";
 export const createCohort = async (req, res) => {
   try {
-    const { title, startDate, endDate } = req.body;
+    const { title, startDate, endDate, startTime, endTime, additionalEmailContent } = req.body;
 
     if (!title || !startDate || !endDate) {
       return res.status(400).json({
@@ -21,7 +21,6 @@ export const createCohort = async (req, res) => {
         message: 'Masterclass not found',
       });
     }
-    console.log(masterclass);
 
     const newCohort = new Cohort({
       masterclassId: masterclass._id,
@@ -31,6 +30,9 @@ export const createCohort = async (req, res) => {
       masterclassPrice: masterclass.price,
       startDate: new Date(startDate),
       endDate: new Date(endDate),
+      startTime: startTime || "08:30",
+      endTime: endTime || "17:00",
+      additionalEmailContent: additionalEmailContent || [],
       students: [],
       payments: [],
       discounts: [],
@@ -43,14 +45,12 @@ export const createCohort = async (req, res) => {
       wss.clients.forEach((client) => {
         if (client.readyState === 1) {
           client.send(JSON.stringify({ type: 'NEW_COHORT_CREATED' }));
-
         }
       });
     }
     res.status(201).json({
       success: true,
       message: 'Cohort created successfully',
-
     });
 
   } catch (error) {

@@ -1,3 +1,4 @@
+
 import mongoose from "mongoose";
 
 const paymentSubSchema = new mongoose.Schema({
@@ -12,6 +13,17 @@ const studentSubSchema = new mongoose.Schema({
   phone: { type: String, required: true },
 }, { _id: false });
 
+const additionalEmailContentSchema = new mongoose.Schema({
+  type: {
+    type: String,
+    required: true,
+    enum: ['welcome', '7day', '2day', 'dayOf', 'lastDay']
+  },
+  subject: { type: String, required: true },
+  content: { type: String, required: true },
+  links: [{ type: String }],
+}, { _id: true });
+
 const cohortSchema = new mongoose.Schema({
   masterclassId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -22,14 +34,35 @@ const cohortSchema = new mongoose.Schema({
   masterclassDescription: { type: String, required: true },
   masterclassHeroImg: { type: String, required: true },
   masterclassPrice: { type: Number, required: true },
-  startDate: { type: Date, required: true },
-  endDate: { type: Date, required: true },
+  startDate: {
+    type: Date,
+    required: true,
+    set: function(date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+  },
+  endDate: {
+    type: Date,
+    required: true,
+    set: function(date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+  },
+  startTime: {
+    type: String,
+    default: "08:30"
+  },
+  endTime: {
+    type: String,
+    default: "17:00"
+  },
+  additionalEmailContent: [additionalEmailContentSchema],
   emailNotifications: [{
     email: String,
     oneWeekReminderSent: Boolean,
     twoDayReminderSent: Boolean,
     dayOfReminderSent: Boolean,
-    secondDayReminderSent: Boolean
+    lastDayReminderSent: Boolean
   }],
   students: [studentSubSchema],
   payments: [paymentSubSchema]
