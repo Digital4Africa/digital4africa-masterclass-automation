@@ -7,6 +7,14 @@ const paymentSubSchema = new mongoose.Schema({
   discount: { type: Number, default: 0 },
 }, { _id: false });
 
+const linkSubSchema = new mongoose.Schema(
+  {
+    name: { type: String, trim: true },
+    link: {type: String, trim: true}
+  },
+  { _id: false }
+);
+
 const studentSubSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   email: { type: String, required: true },
@@ -21,7 +29,7 @@ const additionalEmailContentSchema = new mongoose.Schema({
   },
   subject: { type: String, required: true },
   content: { type: String, required: true },
-  links: [{ type: String }],
+  links: [linkSubSchema],
 }, { _id: true });
 
 const cohortSchema = new mongoose.Schema({

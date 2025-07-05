@@ -10,6 +10,10 @@ export const sendEnrollmentConfirmationEmail = async ({
   email,
   cohortName,
   startDate,
+  endDate,
+  startTime,
+  endTime,
+  additionalEmailContent = []
 }) => {
   try {
     const formattedStartDate = new Date(startDate).toLocaleDateString('en-US', {
@@ -18,6 +22,49 @@ export const sendEnrollmentConfirmationEmail = async ({
       day: 'numeric',
       year: 'numeric',
     });
+
+    const formatTime = (timeStr) => {
+      const [hours, minutes] = timeStr.split(':');
+      const hourNum = parseInt(hours, 10);
+      const period = hourNum >= 12 ? 'PM' : 'AM';
+      const displayHour = hourNum % 12 || 12;
+      return `${displayHour}:${minutes} ${period}`;
+    };
+
+    const displayStartTime = formatTime(startTime);
+    const displayEndTime = formatTime(endTime);
+    const isSingleDay = new Date(startDate).toDateString() === new Date(endDate).toDateString();
+    const timeDisplay = isSingleDay ? `${displayStartTime} - ${displayEndTime}` : `${displayStartTime} - ${displayEndTime} daily`;
+
+    const welcomeAdditions = additionalEmailContent.filter(item => item.type === 'welcome');
+
+    const additionalSectionsHTML = welcomeAdditions.map((item, index) => {
+      const colors = [
+        { background: 'linear-gradient(135deg, #ebf8ff 0%, #f0fff4 100%)', border: '#0069AA' },
+        { background: 'linear-gradient(135deg, #fef5e7 0%, #f0fff4 100%)', border: '#E32726' },
+        { background: 'linear-gradient(135deg, #f0fff4 0%, #ebf8ff 100%)', border: '#38a169' }
+      ];
+      const colorIndex = index % colors.length;
+
+      let linksHTML = '';
+      if (item.links && item.links.length > 0) {
+        linksHTML = item.links.map(link =>
+          `<p style="color: #4a5568; margin: 8px 0 0 0;">
+            <a href="${link.link}" style="color: #0069AA; text-decoration: none;">${link.name}</a>
+          </p>`
+        ).join('');
+      }
+
+      return `
+        <div style="margin-top: 20px; padding: 20px; background: ${colors[colorIndex].background}; border-radius: 8px; border-left: 4px solid ${colors[colorIndex].border};">
+          <div style="color: #2d3748; font-weight: 600; font-size: 15px; margin-bottom: 8px;">${item.subject}</div>
+          <div style="color: #4a5568; font-size: 14px; line-height: 1.6; white-space: pre-line;">
+            ${item.content}
+          </div>
+          ${linksHTML}
+        </div>
+      `;
+    }).join('');
 
     const html = `
       <!DOCTYPE html>
@@ -55,7 +102,7 @@ export const sendEnrollmentConfirmationEmail = async ({
                           <div style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed #cbd5e0;">
                             <div style="color: #a0aec0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">📅 Class Starts</div>
                             <div style="color: #2d3748; font-weight: 600; font-size: 18px;">${formattedStartDate}</div>
-                            <div style="color: #718096; font-size: 14px; margin-top: 4px;">9:00 AM - 4:00 PM (Both Days)</div>
+                            <div style="color: #718096; font-size: 14px; margin-top: 4px;">${timeDisplay}</div>
                           </div>
 
                           <div style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed #cbd5e0;">
@@ -105,9 +152,11 @@ export const sendEnrollmentConfirmationEmail = async ({
                     <div style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #f0fff4 0%, #ebf8ff 100%); border-radius: 8px; border-left: 4px solid #38a169;">
                       <div style="color: #2d3748; font-weight: 600; font-size: 15px; margin-bottom: 8px;">🍽️ Meals Provided</div>
                       <div style="color: #4a5568; font-size: 14px; line-height: 1.6;">
-                        Snacks, lunch, and bottomless tea & coffee will be provided throughout both days. We'll ask for your lunch preferences closer to the date.
+                        Snacks, lunch, and bottomless tea & coffee will be provided throughout the sessions. We'll ask for your lunch preferences closer to the date.
                       </div>
                     </div>
+
+                    ${additionalSectionsHTML}
 
                     <div style="margin-top: 40px; text-align: center; padding-top: 25px; border-top: 1px solid #e2e8f0;">
                       <p style="color: #718096; font-size: 15px; margin: 0; line-height: 1.6;">
@@ -129,7 +178,7 @@ export const sendEnrollmentConfirmationEmail = async ({
       </html>
     `;
 
-    const text = `Enrollment Confirmation for ${fullName}:\n\nCongratulations! You have successfully enrolled in ${cohortName}.\n\nClass Details:\n- Start Date: ${startDate}\n- Time: 9:00 AM - 4:00 PM (Both Days)\n- Location: Digital 4 Africa Office, Delta Corner Annex, 4th Floor\n\nWhat to Bring:\n- Your laptop\n- A pen and notebook\n\nParking: Ask guards for Nairobi Garage Parking on Floor P1\nTaxi/Matatu: Use front entrance along Waiyaki Way opposite Naivas\n\nMeals and snacks will be provided. We'll send reminder emails as the class approaches.\n\n— D4A Team`;
+    const text = `Enrollment Confirmation for ${fullName}:\n\nCongratulations! You have successfully enrolled in ${cohortName}.\n\nClass Details:\n- Start Date: ${formattedStartDate}\n- Time: ${timeDisplay}\n- Location: Digital 4 Africa Office, Delta Corner Annex, 4th Floor\n\nWhat to Bring:\n- Your laptop\n- A pen and notebook\n\nParking: Ask guards for Nairobi Garage Parking on Floor P1\nTaxi/Matatu: Use front entrance along Waiyaki Way opposite Naivas\n\nMeals and snacks will be provided. We'll send reminder emails as the class approaches.\n\n${welcomeAdditions.map(item => `\n${item.subject}:\n${item.content}`).join('\n')}\n\n— D4A Team`;
 
     await client.sendEmail({
       From: process.env.OPERATIONS_EMAIL,

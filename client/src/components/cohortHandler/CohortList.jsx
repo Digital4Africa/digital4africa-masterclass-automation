@@ -12,11 +12,18 @@ const CohortList = () => {
 
   const getCohortStatus = (cohort) => {
     const now = new Date();
-    const start = new Date(cohort.startDate);
-    const end = new Date(cohort.endDate);
+    const startDate = new Date(cohort.startDate);
+    const endDate = new Date(cohort.endDate);
 
-    if (now < start) return "upcoming";
-    if (now >= start && now <= end) return "inprogress";
+    // Set time components
+    const [startHours, startMinutes] = cohort.startTime.split(':');
+    startDate.setHours(parseInt(startHours), startDate.setMinutes(parseInt(startMinutes)));
+
+    const [endHours, endMinutes] = cohort.endTime.split(':');
+    endDate.setHours(parseInt(endHours), endDate.setMinutes(parseInt(endMinutes)));
+
+    if (now < startDate) return "upcoming";
+    if (now >= startDate && now <= endDate) return "inprogress";
     return "ended";
   };
 

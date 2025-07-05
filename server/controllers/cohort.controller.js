@@ -65,12 +65,21 @@ export const createCohort = async (req, res) => {
 
 export const updateCohortDetails = async (req, res) => {
   try {
-    const { cohortId, masterclassId, startDate, endDate } = req.body;
+    const {
+      cohortId,
+      masterclassId,
+      masterclassPrice,
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+      additionalEmailContent
+    } = req.body;
 
     if (!cohortId || !masterclassId || !startDate || !endDate) {
       return res.status(400).json({
         success: false,
-        message: 'cohortId, masterclassTitle, startDate, and endDate are required',
+        message: 'cohortId, masterclassId, startDate, and endDate are required',
       });
     }
 
@@ -83,17 +92,24 @@ export const updateCohortDetails = async (req, res) => {
       });
     }
 
+    const updateData = {
+      masterclassId: masterclass._id,
+      masterclassTitle: masterclass.title,
+      masterclassDescription: masterclass.description,
+      masterclassHeroImg: masterclass.heroImage,
+      masterclassPrice: masterclassPrice || masterclass.price,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+    };
+
+    // Add optional fields if they exist in the request
+    if (startTime) updateData.startTime = startTime;
+    if (endTime) updateData.endTime = endTime;
+    if (additionalEmailContent) updateData.additionalEmailContent = additionalEmailContent;
+
     const updatedCohort = await Cohort.findByIdAndUpdate(
       cohortId,
-      {
-        masterclassId: masterclass._id,
-        masterclassTitle: masterclass.title,
-        masterclassDescription: masterclass.description,
-        masterclassHeroImg: masterclass.heroImage,
-        masterclassPrice: masterclass.price,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
-      },
+      updateData,
       { new: true }
     );
 
@@ -146,7 +162,7 @@ export const getStudentsCohortDetails = async (req, res) => {
     const cohorts = await Cohort.find({
       endDate: { $gte: today }, // Not ended yet
     }).select(
-      '_id masterclassId masterclassHeroImg masterclassTitle masterclassDescription masterclassPrice startDate endDate'
+      '_id masterclassId masterclassHeroImg masterclassTitle masterclassDescription masterclassPrice startDate endDate startTime endTime'
     );
 
     const filteredCohorts = cohorts
@@ -162,7 +178,9 @@ export const getStudentsCohortDetails = async (req, res) => {
         masterclassDescription: cohort.masterclassDescription,
         masterclassPrice: cohort.masterclassPrice,
         startDate: cohort.startDate,
-        endDate: cohort.endDate
+        endDate: cohort.endDate,
+        startTime: cohort.startTime,
+        endTime: cohort.endTime
       }));
 
     res.status(200).json({

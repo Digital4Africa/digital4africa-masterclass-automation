@@ -1,5 +1,4 @@
 import { useSelector, useDispatch } from "react-redux";
-
 import { fetchCohorts } from "../../features/cohorts/cohortsSlice";
 import { formatDate } from "../../utils/formatDate";
 
@@ -8,42 +7,31 @@ const CohortTable = () => {
   const now = new Date();
   const cohortsState = useSelector((state) => state.cohorts);
   const { allCohorts, loading, error } = cohortsState;
-  
 
-  // Filter and process cohorts
   const filteredCohorts = allCohorts
     .filter((cohort) => {
-      // const start = new Date(cohort.startDate);
       const end = new Date(cohort.endDate);
-      return now <= end; // Only show cohorts that haven't ended yet
+      return now <= end;
     })
     .map((cohort) => {
       const start = new Date(cohort.startDate);
-      const end = new Date(cohort.endDate);
+      const [startHours, startMinutes] = cohort.startTime.split(':').map(Number);
+      start.setHours(startHours, startMinutes, 0, 0);
 
-      // Determine status based on dates ONLY
+      const end = new Date(cohort.endDate);
       const status = now >= start && now <= end ? "ongoing" : "upcoming";
 
-      // Calculate total discounts
       const totalDiscounts =
-        cohort.discounts?.reduce(
-          (sum, discount) => sum + (discount.amount || 0),
-          0
-        ) || 0;
+        cohort.discounts?.reduce((sum, discount) => sum + (discount.amount || 0), 0) || 0;
 
-      // Calculate total revenue from payments
       const totalRevenue =
-        cohort.payments?.reduce(
-          (sum, payment) => sum + (payment.amount || 0),
-          0
-        ) || 0;
+        cohort.payments?.reduce((sum, payment) => sum + (payment.amount || 0), 0) || 0;
 
-      // Calculate net revenue (total revenue - total discounts)
       const netRevenue = totalRevenue - totalDiscounts;
 
       return {
-        ...cohort, // Keep ALL original fields from DB
-        status, // Only add status field
+        ...cohort,
+        status,
         formattedStart: formatDate(start),
         formattedEnd: formatDate(end),
         totalDiscounts,
@@ -56,7 +44,6 @@ const CohortTable = () => {
     ongoing: "bg-green-100 text-green-800",
   };
 
-  // Loading state
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -73,7 +60,6 @@ const CohortTable = () => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-64 space-y-4">

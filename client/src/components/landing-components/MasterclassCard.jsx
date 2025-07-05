@@ -7,6 +7,9 @@ const MasterclassCard = ({ cohort }) => {
   const getStatus = () => {
     const today = new Date();
     const startDate = new Date(cohort.startDate);
+    const [startHours, startMinutes] = cohort.startTime.split(':').map(Number);
+    startDate.setHours(startHours, startMinutes, 0, 0);
+
     const endDate = new Date(cohort.endDate);
 
     if (today < startDate) {
@@ -38,7 +41,7 @@ const MasterclassCard = ({ cohort }) => {
 
   const handleEnrollClick = () => {
     navigate(`/checkout/${cohort.cohortId}`);
-    scrollToTop()
+    scrollToTop();
   };
 
   const getStatusStyles = () => {
@@ -46,7 +49,7 @@ const MasterclassCard = ({ cohort }) => {
       case 'blue':
         return {
           badge: 'bg-blue-100 text-blue-800 border-blue-200',
-          button: 'bg-[#0060a1] hover:bg-[#005589] text-white', // Changed to D4A blue
+          button: 'bg-[#0060a1] hover:bg-[#005589] text-white',
           accent: 'border-blue-200'
         };
       case 'green':
@@ -68,7 +71,6 @@ const MasterclassCard = ({ cohort }) => {
 
   return (
     <div className={`bg-white rounded-2xl shadow-lg overflow-hidden border-2 ${styles.accent} hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full`}>
-      {/* Hero Image */}
       <div className="relative h-48 overflow-hidden">
         <img
           src={cohort.masterclassHeroImg}
@@ -82,7 +84,6 @@ const MasterclassCard = ({ cohort }) => {
         </div>
       </div>
 
-      {/* Content */}
       <div className="p-6 flex flex-col flex-grow">
         <h3 className="text-xl font-bold text-gray-800 mb-3 line-clamp-2 leading-tight">
           {cohort.masterclassTitle}
@@ -92,7 +93,6 @@ const MasterclassCard = ({ cohort }) => {
           {cohort.masterclassDescription}
         </p>
 
-        {/* Dates */}
         <div className="flex justify-between items-center mb-4 text-sm text-gray-500">
           <div>
             <span className="font-medium">Start:</span> {formatDate(cohort.startDate)}
@@ -102,7 +102,6 @@ const MasterclassCard = ({ cohort }) => {
           </div>
         </div>
 
-        {/* Price and Button */}
         <div className="flex justify-between items-center">
           <div className="text-2xl font-bold text-[#d20a11]">
             {formatPrice(cohort.masterclassPrice)}
@@ -110,9 +109,9 @@ const MasterclassCard = ({ cohort }) => {
 
           <button
             onClick={handleEnrollClick}
-            disabled={status === 'ongoing' || status === 'completed'}
+            disabled={status !== 'upcoming'}
             className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${styles.button} ${
-              status === 'ongoing' || status === 'completed'
+              status !== 'upcoming'
                 ? 'transform-none'
                 : 'hover:transform hover:scale-105'
             }`}

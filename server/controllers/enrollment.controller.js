@@ -225,6 +225,9 @@ export const enrollStudentAfterPayment = async (req, res) => {
             email,
             cohortName: cohort.masterclassTitle,
             startDate: cohort.startDate,
+            startTime: cohort.startTime,
+            endTime: cohort.endTime,
+            additionalEmailContent: cohort.additionalEmailContent
           });
         }
       })

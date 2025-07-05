@@ -6,6 +6,8 @@ const StatsCards = () => {
 
   const cohorts = allCohorts || [];
 
+  console.log("cohorts", cohorts)
+
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
   const currentYear = currentDate.getFullYear();
@@ -14,12 +16,22 @@ const StatsCards = () => {
   // Filter upcoming and ongoing cohorts
   const upcoming = cohorts.filter((cohort) => {
     const startDate = new Date(cohort.startDate);
+    const [startHours, startMinutes] = cohort.startTime.split(':').map(Number);
+
+    // Set the start time on the start date
+    startDate.setHours(startHours, startMinutes, 0, 0);
+
     return currentDate < startDate;
   }).length;
 
   const ongoing = cohorts.filter((cohort) => {
     const startDate = new Date(cohort.startDate);
     const endDate = new Date(cohort.endDate);
+    const [startHours, startMinutes] = cohort.startTime.split(':').map(Number);
+
+    // Set the start time on the start date
+    startDate.setHours(startHours, startMinutes, 0, 0);
+
     return currentDate >= startDate && currentDate <= endDate;
   }).length;
 

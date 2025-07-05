@@ -15,6 +15,13 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
   const [endTime, setEndTime] = useState("17:00");
   const [additionalEmails, setAdditionalEmails] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAddingEmail, setIsAddingEmail] = useState(false);
+  const [newEmail, setNewEmail] = useState({
+    type: '',
+    subject: '',
+    content: '',
+    links: [{ name: '', link: '' }]
+  });
   const [toast, setToast] = useState({
     isVisible: false,
     message: "",
@@ -27,6 +34,7 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
   }, [dispatch]);
 
   const emailTypes = [
+    { value: '', label: 'Select Email Type' },
     { value: 'welcome', label: 'Welcome Email' },
     { value: '7day', label: '7 Day Reminder' },
     { value: '2day', label: '2 Day Reminder' },
@@ -34,55 +42,67 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
     { value: 'lastDay', label: 'Last Day Reminder' }
   ];
 
-  const addEmailContent = () => {
-    const newEmail = {
-      id: Date.now(), // temporary ID for frontend management
-      type: 'welcome',
+  const startAddingEmail = () => {
+    setIsAddingEmail(true);
+    setNewEmail({
+      type: '',
       subject: '',
       content: '',
-      links: ['']
+      links: [{ name: '', link: '' }]
+    });
+  };
+
+  const cancelAddingEmail = () => {
+    setIsAddingEmail(false);
+  };
+
+  const addNewEmail = () => {
+    if (!newEmail.type || !newEmail.subject || !newEmail.content) {
+      setToast({
+        isVisible: true,
+        message: "Please fill all required email fields",
+        type: "error",
+      });
+      return;
+    }
+
+    const emailToAdd = {
+      id: Date.now(),
+      type: newEmail.type,
+      subject: newEmail.subject,
+      content: newEmail.content,
+      links: newEmail.links.filter(link => link.name.trim() !== '' && link.link.trim() !== '')
     };
-    setAdditionalEmails([...additionalEmails, newEmail]);
+
+    setAdditionalEmails([...additionalEmails, emailToAdd]);
+    setIsAddingEmail(false);
+  };
+
+  const updateNewEmail = (field, value) => {
+    setNewEmail({ ...newEmail, [field]: value });
+  };
+
+  const addLinkToNewEmail = () => {
+    setNewEmail({
+      ...newEmail,
+      links: [...newEmail.links, { name: '', link: '' }]
+    });
+  };
+
+  const updateNewEmailLink = (linkIndex, field, value) => {
+    const updatedLinks = newEmail.links.map((link, index) =>
+      index === linkIndex ? { ...link, [field]: value } : link
+    );
+    setNewEmail({ ...newEmail, links: updatedLinks });
+  };
+
+  const removeLinkFromNewEmail = (linkIndex) => {
+    const updatedLinks = newEmail.links.filter((_, index) => index !== linkIndex);
+    setNewEmail({ ...newEmail, links: updatedLinks });
   };
 
   const removeEmailContent = (id) => {
     setAdditionalEmails(additionalEmails.filter(email => email.id !== id));
-  };
-
-  const updateEmailContent = (id, field, value) => {
-    setAdditionalEmails(additionalEmails.map(email =>
-      email.id === id ? { ...email, [field]: value } : email
-    ));
-  };
-
-  const addLinkToEmail = (emailId) => {
-    setAdditionalEmails(additionalEmails.map(email =>
-      email.id === emailId ? { ...email, links: [...email.links, ''] } : email
-    ));
-  };
-
-  const updateEmailLink = (emailId, linkIndex, value) => {
-    setAdditionalEmails(additionalEmails.map(email =>
-      email.id === emailId
-        ? {
-            ...email,
-            links: email.links.map((link, index) =>
-              index === linkIndex ? value : link
-            )
-          }
-        : email
-    ));
-  };
-
-  const removeLinkFromEmail = (emailId, linkIndex) => {
-    setAdditionalEmails(additionalEmails.map(email =>
-      email.id === emailId
-        ? {
-            ...email,
-            links: email.links.filter((_, index) => index !== linkIndex)
-          }
-        : email
-    ));
   };
 
   const handleSubmit = async (e) => {
@@ -106,20 +126,24 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
       return;
     }
 
+    const masterclass = masterclasses.find((m) => m._id === selectedMasterclass);
+    const masterclassName = masterclass?.title || 'Unknown Masterclass';
+
+    const confirmationMessage = `Please confirm these details:\n\nMasterclass: ${masterclassName}\nStart Date: ${startDate} at ${startTime}\nEnd Date: ${endDate}\nAdditional Emails: ${additionalEmails.length}\n\nAre these details correct?`;
+
+    if (!window.confirm(confirmationMessage)) {
+      return;
+    }
+
     setIsSubmitting(true);
     dispatch(showOverlay());
 
     try {
-      const masterclass = masterclasses.find(
-        (m) => m._id === selectedMasterclass
-      );
-
-      // Clean up additional emails - remove temporary IDs and empty links
       const cleanedAdditionalEmails = additionalEmails.map(email => ({
         type: email.type,
         subject: email.subject,
         content: email.content,
-        links: email.links.filter(link => link.trim() !== '')
+        links: email.links.filter(linkObj => linkObj.name.trim() !== '' && linkObj.link.trim() !== '')
       })).filter(email => email.subject.trim() !== '' && email.content.trim() !== '');
 
       await axios.post(
@@ -160,11 +184,16 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
     }
   };
 
+  const getEmailTypeLabel = (value) => {
+    const type = emailTypes.find(t => t.value === value);
+    return type ? type.label : 'Unknown Type';
+  };
+
   return (
     <>
       <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
         <div
-          className="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 ease-out scale-95 opacity-0 animate-modal-appear"
+          className="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[98vh] overflow-y-auto transform transition-all duration-300 ease-out scale-95 opacity-0 animate-modal-appear"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="p-6">
@@ -198,15 +227,15 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-[var(--d4a-black)] mb-1">
-                    Masterclass *
+                    Masterclass <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={selectedMasterclass}
                     onChange={(e) => setSelectedMasterclass(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent"
+                    className="w-full px-1.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
                     required
                   >
-                    <option value="">Select Masterclass</option>
+                    <option value="" disabled>Select Masterclass</option>
                     {masterclasses.map((masterclass) => (
                       <option key={masterclass._id} value={masterclass._id}>
                         {masterclass.title}
@@ -218,26 +247,26 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-[var(--d4a-black)] mb-1">
-                      Start Date *
+                      Start Date <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent"
+                      className="w-full px-1.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
                       required
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-[var(--d4a-black)] mb-1">
-                      End Date *
+                      End Date <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent"
+                      className="w-full px-1.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
                       required
                     />
                   </div>
@@ -252,7 +281,7 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
                       type="time"
                       value={startTime}
                       onChange={(e) => setStartTime(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent"
+                      className="w-full px-1.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
                     />
                   </div>
 
@@ -264,7 +293,7 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
                       type="time"
                       value={endTime}
                       onChange={(e) => setEndTime(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent"
+                      className="w-full px-1.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
                     />
                   </div>
                 </div>
@@ -276,121 +305,205 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
                   <h4 className="text-lg font-semibold text-[var(--d4a-black)]">
                     Additional Email Content
                   </h4>
-                  <button
-                    type="button"
-                    onClick={addEmailContent}
-                    className="px-3 py-2 text-sm font-medium text-white bg-[var(--d4a-blue)] rounded-md hover:bg-opacity-90 transition-colors flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Add Email
-                  </button>
+                  {!isAddingEmail && (
+                    <button
+                      type="button"
+                      onClick={startAddingEmail}
+                      className="px-1.5 py-1.5 text-sm font-medium text-white bg-[var(--d4a-blue)] rounded-md hover:bg-opacity-90 transition-colors flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      Add Email content
+                    </button>
+                  )}
                 </div>
 
+                {/* Existing Emails */}
                 {additionalEmails.map((email) => (
-                  <div key={email.id} className="border border-gray-200 rounded-lg p-4 space-y-4">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1 grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-[var(--d4a-black)] mb-1">
-                            Email Type
-                          </label>
-                          <select
-                            value={email.type}
-                            onChange={(e) => updateEmailContent(email.id, 'type', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
-                          >
-                            {emailTypes.map((type) => (
-                              <option key={type.value} value={type.value}>
-                                {type.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                  <div key={email.id} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-sm text-gray-700">
+                          {getEmailTypeLabel(email.type)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeEmailContent(email.id)}
+                          className="text-red-500 hover:text-red-700 transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
 
-                        <div>
-                          <label className="block text-sm font-medium text-[var(--d4a-black)] mb-1">
-                            Subject
-                          </label>
-                          <input
-                            type="text"
-                            value={email.subject}
-                            onChange={(e) => updateEmailContent(email.id, 'subject', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
-                            placeholder="Email subject"
-                          />
+                    <div className="prose prose-sm max-w-none">
+                      <strong>{email.subject}</strong>
+                      <p className="whitespace-pre-line">{email.content}</p>
+                    </div>
+
+                    {email.links.length > 0 && (
+                      <div className="mt-2">
+                        <div className="text-xs font-medium text-gray-500 mb-1">LINKS</div>
+                        <div className="space-y-1">
+                          {email.links.map((link, index) => (
+                            <div key={index} className="flex items-center gap-2">
+                              <a
+                                href={link.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-[var(--d4a-blue)] hover:underline"
+                              >
+                                {link.name || link.link}
+                              </a>
+                            </div>
+                          ))}
                         </div>
                       </div>
+                    )}
+                  </div>
+                ))}
 
-                      <button
-                        type="button"
-                        onClick={() => removeEmailContent(email.id)}
-                        className="ml-4 text-red-500 hover:text-red-700 transition-colors"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+                {/* Add New Email Form */}
+                {isAddingEmail && (
+                  <div className="border border-gray-200 rounded-lg p-4 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-[var(--d4a-black)] mb-1">
+                          Email Type <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={newEmail.type}
+                          onChange={(e) => updateNewEmail('type', e.target.value)}
+                          className="w-full px-1.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
+                          required
+                        >
+                          {emailTypes.map((type) => (
+                            <option key={type.value} value={type.value}>
+                              {type.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-[var(--d4a-black)] mb-1">
+                          Subheading <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={newEmail.subject}
+                          onChange={(e) => updateNewEmail('subject', e.target.value)}
+                          className="w-full px-1.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
+                          placeholder="Email subheading"
+                          required
+                        />
+                      </div>
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-[var(--d4a-black)] mb-1">
-                        Content
+                        Content <span className="text-red-500">*</span>
                       </label>
                       <textarea
-                        value={email.content}
-                        onChange={(e) => updateEmailContent(email.id, 'content', e.target.value)}
+                        value={newEmail.content}
+                        onChange={(e) => updateNewEmail('content', e.target.value)}
                         rows={4}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
+                        className="w-full px-1.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
                         placeholder="Email content"
+                        required
                       />
                     </div>
 
                     <div>
                       <div className="flex justify-between items-center mb-2">
                         <label className="block text-sm font-medium text-[var(--d4a-black)]">
-                          Links
+                          Links (Optional)
                         </label>
                         <button
                           type="button"
-                          onClick={() => addLinkToEmail(email.id)}
+                          onClick={addLinkToNewEmail}
                           className="text-sm text-[var(--d4a-blue)] hover:text-opacity-80 transition-colors"
                         >
                           + Add Link
                         </button>
                       </div>
 
-                      {email.links.map((link, linkIndex) => (
-                        <div key={linkIndex} className="flex gap-2 mb-2">
-                          <input
-                            type="url"
-                            value={link}
-                            onChange={(e) => updateEmailLink(email.id, linkIndex, e.target.value)}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
-                            placeholder="https://example.com"
-                          />
-                          {email.links.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => removeLinkFromEmail(email.id, linkIndex)}
-                              className="text-red-500 hover:text-red-700 transition-colors"
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            </button>
-                          )}
+                      {newEmail.links.map((link, linkIndex) => (
+                        <div key={linkIndex} className="space-y-2 mb-3 p-3 bg-gray-50 rounded-md">
+                          <div className="flex gap-2">
+                            <div className="flex-1">
+                              <label className="block text-xs font-medium text-[var(--d4a-black)] mb-1">
+                                Link Name
+                              </label>
+                              <input
+                                type="text"
+                                value={link.name}
+                                onChange={(e) => updateNewEmailLink(linkIndex, 'name', e.target.value)}
+                                className="w-full px-1.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
+                                placeholder="Link display name"
+                              />
+                            </div>
+
+                            <div className="flex-1">
+                              <label className="block text-xs font-medium text-[var(--d4a-black)] mb-1">
+                                URL
+                              </label>
+                              <div className="flex gap-2">
+                                <input
+                                  type="url"
+                                  value={link.link}
+                                  onChange={(e) => updateNewEmailLink(linkIndex, 'link', e.target.value)}
+                                  className="w-full px-1.5 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--d4a-blue)] focus:border-transparent text-sm"
+                                  placeholder="https://example.com"
+                                />
+                                {newEmail.links.length > 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => removeLinkFromNewEmail(linkIndex)}
+                                    className="self-end text-red-500 hover:text-red-700 transition-colors mb-1"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
-                  </div>
-                ))}
 
-                {additionalEmails.length === 0 && (
+                    <div className="flex justify-end space-x-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={cancelAddingEmail}
+                        className="px-4 py-2 text-sm font-medium text-[var(--d4a-black)] hover:text-[var(--d4a-red)] transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={addNewEmail}
+                        disabled={!newEmail.type || !newEmail.subject || !newEmail.content}
+                        className={`px-6 py-2 text-sm font-medium text-white bg-[var(--d4a-blue)] rounded-md hover:bg-opacity-90 transition-colors ${!newEmail.type || !newEmail.subject || !newEmail.content
+                            ? "opacity-80 cursor-not-allowed"
+                            : ""
+                          }`}
+                      >
+                        Add content
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {additionalEmails.length === 0 && !isAddingEmail && (
                   <div className="text-center py-8 text-gray-500">
                     <p>No additional emails configured</p>
-                    <p className="text-sm">Click "Add Email" to create custom email content</p>
+                    <p className="text-sm">Click "Add content" to create custom email content</p>
                   </div>
                 )}
               </div>
@@ -407,9 +520,8 @@ const AddCohortModal = ({ onClose, masterclasses }) => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`px-6 py-2 text-sm font-medium text-white bg-[var(--d4a-blue)] rounded-md hover:bg-opacity-90 transition-colors ${
-                    isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-                  }`}
+                  className={`px-6 py-2 text-sm font-medium text-white bg-[var(--d4a-red)] rounded-md hover:bg-opacity-90 transition-colors ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                    }`}
                 >
                   {isSubmitting ? "Creating Cohort..." : "Create Cohort"}
                 </button>

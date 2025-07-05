@@ -4,19 +4,19 @@ import {
   sendOneWeekReminderEmail,
   sendTwoDayReminderEmail,
   sendDayOfReminderEmail,
-  sendSecondDayReminderEmail
+  sendLastDayReminderEmail
 } from './sendReminderEmails.js';
 
 export const startEmailScheduler = () => {
   console.log('📅 Email scheduler started');
 
-  cron.schedule('0 6 * * *', async () => {
+  cron.schedule('30 16 * * *', async () => {
     console.log('🔄 Daily email check running at:', new Date());
 
     await checkAndSendReminders(7, 'oneWeekReminderSent', sendOneWeekReminderEmail);
     await checkAndSendReminders(2, 'twoDayReminderSent', sendTwoDayReminderEmail);
     await checkAndSendReminders(0, 'dayOfReminderSent', sendDayOfReminderEmail);
-    await checkSecondDayReminders();
+    await checkLastDayReminders();
   });
 };
 
@@ -44,40 +44,35 @@ const checkAndSendReminders = async (daysBefore, sentFlag, emailSender) => {
   }
 };
 
-const checkSecondDayReminders = async () => {
+const checkLastDayReminders = async () => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
 
     const cohorts = await Cohort.find({
-      startDate: {
-        $lt: today,
-        $gte: yesterday
-      },
       endDate: {
-        $gte: today
+        $gte: today,
+        $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
       }
     });
 
-    console.log(`Found ${cohorts.length} potential second-day cohorts`);
+    console.log(`Found ${cohorts.length} cohorts ending today`);
 
     for (const cohort of cohorts) {
       const needsReminder = cohort.students.some(student => {
         const notification = cohort.emailNotifications.find(n => n.email === student.email);
-        return !notification || !notification.secondDayReminderSent;
+        return !notification || !notification.lastDayReminderSent;
       });
 
       if (needsReminder) {
-        console.log(`Processing cohort ${cohort._id} for second-day reminders`);
-        await sendRemindersForCohort(cohort, 'secondDayReminderSent', sendSecondDayReminderEmail);
+        console.log(`Processing cohort ${cohort._id} for last-day reminders`);
+        await sendRemindersForCohort(cohort, 'lastDayReminderSent', sendLastDayReminderEmail);
       } else {
-        console.log(`Cohort ${cohort._id} already had second-day reminders sent`);
+        console.log(`Cohort ${cohort._id} already had last-day reminders sent`);
       }
     }
   } catch (error) {
-    console.error('Error in checkSecondDayReminders:', error);
+    console.error('Error in checkLastDayReminders:', error);
   }
 };
 
@@ -91,6 +86,9 @@ const sendRemindersForCohort = async (cohort, sentFlag, emailSender) => {
         email: student.email,
         cohortName: cohort.masterclassTitle,
         startDate: cohort.startDate,
+        startTime: cohort.startTime,
+        endTime: cohort.endTime,
+        additionalEmailContent: cohort.additionalEmailContent,
       });
 
       if (notification) {
