@@ -10,7 +10,7 @@ import {
 export const startEmailScheduler = () => {
   console.log('📅 Email scheduler started');
 
-  cron.schedule('30 16 * * *', async () => {
+  cron.schedule('0 6 * * *', async () => {
     console.log('🔄 Daily email check running at:', new Date());
 
     await checkAndSendReminders(7, 'oneWeekReminderSent', sendOneWeekReminderEmail);

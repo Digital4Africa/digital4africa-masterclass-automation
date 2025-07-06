@@ -137,6 +137,8 @@ export const sendTwoDayReminderEmail = async ({ fullName, email, cohortName, sta
       year: 'numeric',
     });
 
+    const additionalSections = generateAdditionalSections(additionalEmailContent, '2day');
+
     const displayStartTime = formatTimeDisplay(startTime, endTime).split(' - ')[0];
 
     const html = `
@@ -163,6 +165,7 @@ export const sendTwoDayReminderEmail = async ({ fullName, email, cohortName, sta
               <p style="color: #4a5568; margin: 0 0 10px;"><strong>Delta Corner Annex, 4th Floor</strong><br>Opposite Westlands Stage, Waiyaki Way<br>(Building with BMW Centre & PWC)</p>
               <a href="https://g.page/Digital4Africa?share" style="display: inline-block; background: #0069AA; color: #ffffff; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; margin-top: 10px;">View on Google Maps</a>
             </div>
+            ${additionalSections}
 
             <div style="margin-top: 30px; text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
               <p style="color: #718096; font-size: 14px; margin: 0;">See you soon!<br><strong>D4A Masterclass Team</strong></p>
