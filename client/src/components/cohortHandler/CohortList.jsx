@@ -10,20 +10,24 @@ const CohortList = () => {
     isVisible: false,
   });
 
+  console.log("allCohorts", allCohorts);
+
   const getCohortStatus = (cohort) => {
     const now = new Date();
     const startDate = new Date(cohort.startDate);
     const endDate = new Date(cohort.endDate);
 
-    // Set time components
-    const [startHours, startMinutes] = cohort.startTime.split(':');
-    startDate.setHours(parseInt(startHours), startDate.setMinutes(parseInt(startMinutes)));
+    const [startHours, startMinutes] = cohort.startTime.split(':').map(Number);
+    const [endHours, endMinutes] = cohort.endTime.split(':').map(Number);
 
-    const [endHours, endMinutes] = cohort.endTime.split(':');
-    endDate.setHours(parseInt(endHours), endDate.setMinutes(parseInt(endMinutes)));
+    const startDateTime = new Date(startDate);
+    startDateTime.setHours(startHours, startMinutes);
 
-    if (now < startDate) return "upcoming";
-    if (now >= startDate && now <= endDate) return "inprogress";
+    const endDateTime = new Date(endDate);
+    endDateTime.setHours(endHours, endMinutes);
+
+    if (now < startDateTime) return "upcoming";
+    if (now >= startDateTime && now <= endDateTime) return "inprogress";
     return "ended";
   };
 

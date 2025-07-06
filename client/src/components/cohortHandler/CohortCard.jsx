@@ -81,17 +81,17 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
           <div className="flex space-x-2">
             <button
               onClick={() => setShowModal(true)}
-              className="bg-white/90 backdrop-blur-sm hover:bg-white p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+              className="bg-white/90 cursor-pointer backdrop-blur-sm hover:bg-white p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
               title="Edit cohort"
             >
-              <Edit3 size={16} className="text-gray-700 hover:text-blue-600" />
+              <Edit3 size={16} className="text-gray-600 hover:text-blue-600 transition-colors" />
             </button>
             <button
               onClick={handleDelete}
-              className="bg-white/90 backdrop-blur-sm hover:bg-white p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+              className="bg-white/90 cursor-pointer backdrop-blur-sm hover:bg-white p-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
               title="Delete cohort"
             >
-              <Trash2 size={16} className="text-gray-700 hover:text-red-600" />
+              <Trash2 size={16} className="text-gray-600 hover:text-red-600 transition-colors" />
             </button>
           </div>
         </div>
@@ -124,7 +124,7 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
         <div className="flex space-x-3 pt-2">
           <button
             onClick={() => onCopyLink(cohort._id)}
-            className={`flex-1 text-sm px-4 py-2 rounded-lg transition-colors ${
+            className={`flex-1 text-sm px-4 py-2 rounded-lg transition-colors cursor-pointer ${
               isDisabled
                 ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                 : "btn-secondary"
@@ -136,7 +136,7 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
           </button>
           <button
             onClick={handleGiveDiscount}
-            className={`flex-1 text-sm px-4 py-2 rounded-lg transition-colors ${
+            className={`flex-1 text-sm px-4 py-2 rounded-lg transition-colors cursor-pointer ${
               isDisabled
                 ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                 : "bg-green-600 text-white hover:bg-green-700"

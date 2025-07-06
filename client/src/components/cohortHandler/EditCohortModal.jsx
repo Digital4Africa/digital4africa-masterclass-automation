@@ -7,6 +7,7 @@ import { fetchCohorts } from "../../features/cohorts/cohortsSlice";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const EditCohortModal = ({ onClose, masterclasses, cohort }) => {
+  console.log("cohort", cohort);
   const dispatch = useDispatch();
   const [selectedMasterclass, setSelectedMasterclass] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -116,7 +117,9 @@ const EditCohortModal = ({ onClose, masterclasses, cohort }) => {
   };
 
   const removeEmailContent = (id) => {
-    setAdditionalEmails(additionalEmails.filter(email => email.id !== id));
+    setAdditionalEmails(additionalEmails.filter(email =>
+      (email._id && email._id !== id) || (email.id && email.id !== id)
+    ));
   };
 
   const handleSubmit = async (e) => {
