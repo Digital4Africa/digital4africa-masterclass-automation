@@ -34,16 +34,16 @@ async function compressBackup() {
 async function uploadToR2() {
   const client = new S3Client({
     region: "auto",
-    endpoint: process.env.R2_ENDPOINT,
+    endpoint: process.env.R2_MASTERCLASS_ENDPOINT,
     credentials: {
-      accessKeyId: process.env.R2_ACCESS_KEY,
-      secretAccessKey: process.env.R2_SECRET_KEY,
+      accessKeyId: process.env.R2_MASTERCLASS_ACCESS_KEY,
+      secretAccessKey: process.env.R2_MASTERCLASS_SECRET_KEY,
     },
   });
 
   const stream = fs.createReadStream(archivePath);
   const command = new PutObjectCommand({
-    Bucket: process.env.R2_BUCKET,
+    Bucket: process.env.R2_MASTERCLASS_BUCKET,
     Key: path.basename(archivePath),
     Body: stream,
   });
@@ -54,7 +54,7 @@ async function uploadToR2() {
 
 async function deleteOldBackups(client) {
   const listCommand = new ListObjectsV2Command({
-    Bucket: process.env.R2_BUCKET,
+    Bucket: process.env.R2_MASTERCLASS_BUCKET,
     Prefix: "backup-",
   });
 
@@ -67,7 +67,7 @@ async function deleteOldBackups(client) {
 
   for (let i = 0; i < toDelete; i++) {
     const deleteCommand = new DeleteObjectCommand({
-      Bucket: process.env.R2_BUCKET,
+      Bucket: process.env.R2_MASTERCLASS_BUCKET,
       Key: allBackups[i].Key,
     });
     await client.send(deleteCommand);
