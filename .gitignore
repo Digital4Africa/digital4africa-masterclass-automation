@@ -37,3 +37,6 @@
 Thumbs.db
 ehthumbs.db
 testEmailTemplate.html
+backup-*.tar.gz
+run-backup.sh
+
