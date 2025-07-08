@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import loginAdmin from '../../utils/loginAdmin';
-import Toast from '../Toast'; // Adjust path as needed
+import Toast from '../Toast';
 import { setAdmin, setIsAuthenticated } from '../../features/auth/authSlice';
 import { useDispatch } from 'react-redux';
+import { Eye, EyeOff } from 'lucide-react';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState({ isVisible: false, message: '', type: '' });
-  const dispatch = useDispatch()
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const showToast = (message, type) => {
@@ -31,12 +32,10 @@ const LoginForm = () => {
 
       if (loginResult.success) {
         showToast('Login successful!', 'success');
-        dispatch(setIsAuthenticated(true));
 
-        dispatch(setAdmin(loginResult.data.admin));
-
-        // Give Redux state time to update before navigation
         setTimeout(() => {
+          dispatch(setIsAuthenticated(true));
+          dispatch(setAdmin(loginResult.data.admin));
           navigate('/admin-home', { replace: true });
         }, 1500);
       } else {
@@ -68,19 +67,28 @@ const LoginForm = () => {
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 relative">
           <label htmlFor="password" className="block text-sm font-medium text-gray-700">
             Password
           </label>
-          <input
-            type="password"
-            id="password"
-            className="input-field w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-[#0060a1] focus:ring-1 focus:ring-[#0060a1] outline-none"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={isLoading}
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              className="input-field w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-[#0060a1] focus:ring-1 focus:ring-[#0060a1] outline-none"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={isLoading}
+            />
+            <button
+              type="button"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
 
         <button
@@ -102,7 +110,6 @@ const LoginForm = () => {
         </button>
       </form>
 
-      {/* Toast Component */}
       <Toast
         message={toast.message}
         type={toast.type}

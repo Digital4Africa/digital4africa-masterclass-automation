@@ -24,6 +24,8 @@ const verifyPassword = async (inputPassword, hashedPassword) => {
 };
 
 
+
+
 // Register admin
 export const registerAdmin = async (req, res) => {
 	try {
@@ -168,6 +170,10 @@ export const updateAdminDetails = async (req, res) => {
 export const resetAdminPassword = async (req, res) => {
 	const { currentPassword, newPassword } = req.body;
 	const admin = req.admin;
+	const existingAdmin = await Admin.findOne({ adminId: admin.adminId });
+	if (!existingAdmin) {
+		return res.status(404).json({ success: false, message: "Admin not found" });
+	}
 
 	if (!currentPassword || !newPassword) {
 		return res.status(400).json({ success: false, message: "All fields are required" });
@@ -178,13 +184,13 @@ export const resetAdminPassword = async (req, res) => {
 	}
 
 	try {
-		const isMatch = await verifyPassword(currentPassword, admin.password);
+		const isMatch = await verifyPassword(currentPassword, existingAdmin.password);
 		if (!isMatch) {
 			return res.status(400).json({ success: false, message: "Current password is incorrect" });
 		}
 
-		admin.password = await bcrypt.hash(newPassword, 10);
-		await admin.save();
+		existingAdmin.password = await bcrypt.hash(newPassword, 10);
+		await existingAdmin.save();
 
 		res.status(200).json({ success: true, message: "Password updated successfully" });
 	} catch (error) {
