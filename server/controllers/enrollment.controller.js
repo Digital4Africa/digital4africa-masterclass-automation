@@ -266,49 +266,38 @@ export const enrollStudentAfterPayment = async (req, res) => {
 
 export const getPayments = async (req, res) => {
   try {
-    // Parse query parameters
     const page = parseInt(req.query.page) || 1;
-    const limitParam = req.query.limit;
+    const limitParam = req.query.limitParam || req.query.limit;
     const { fromDate, toDate, status } = req.query;
 
-    // Handle 'all' records case
     const isAll = limitParam === 'all';
     const limit = isAll ? null : parseInt(limitParam) || 10;
     const skip = isAll ? null : (page - 1) * limit;
 
-    // Build filter object
     const filter = {};
 
-    // Date range filter
     if (fromDate && toDate) {
-      filter.createdAt = {
-        $gte: new Date(fromDate),
-        $lte: new Date(toDate)
-      };
+      const start = new Date(fromDate);
+      const end = new Date(toDate);
+      end.setUTCHours(23, 59, 59, 999);          // include entire "toDate"
+      filter.createdAt = { $gte: start, $lte: end };
     }
 
-    // Status filter (if provided and not 'all')
     if (status && status !== 'all') {
       filter.status = status;
     }
 
-    // Get total count of documents (for pagination meta)
     const totalItems = await Payment.countDocuments(filter);
 
-    // Build query
-    let query = Payment.find(filter)
-      .sort({ createdAt: -1 }); // Newest first
+    let query = Payment.find(filter).sort({ createdAt: -1 });
 
-    // Apply pagination if not fetching all records
     if (!isAll) {
       query = query.skip(skip).limit(limit);
     }
 
-    // Execute query
     const payments = await query.exec();
 
-    // Prepare response
-    const response = {
+    return res.status(200).json({
       success: true,
       message: 'Payments fetched successfully',
       data: payments,
@@ -317,15 +306,60 @@ export const getPayments = async (req, res) => {
         currentPage: page,
         totalPages: isAll ? 1 : Math.ceil(totalItems / limit)
       }
-    };
-
-    return res.status(200).json(response);
-
+    });
   } catch (error) {
     console.error('Error fetching payments:', error);
     return res.status(500).json({
       success: false,
       message: 'Server error while fetching payment records'
+    });
+  }
+};
+
+
+
+export const getFinancialMetricsMTD = async (req, res) => {
+  try {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    const monthStart = new Date(currentYear, currentMonth, 1);
+
+    // 1. Fetch successful payments within current month
+    const payments = await Payment.find({
+      status: 'success',
+      createdAt: { $gte: monthStart, $lte: currentDate }
+    }).lean();
+
+    // 2. Fetch used discounts within current month
+    const discounts = await Discount.find({
+      isUsed: true,
+      updatedAt: { $gte: monthStart, $lte: currentDate }
+    }).lean();
+
+    // 3. Calculate metrics
+    const totalRevenueMTD = payments.reduce((sum, payment) => sum + payment.amount, 0);
+    const totalDiscountsMTD = discounts.reduce((sum, discount) => sum + discount.amountOff, 0);
+    const netRevenueMTD = totalRevenueMTD - totalDiscountsMTD;
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        totalRevenueMTD,
+        totalDiscountsMTD,
+        netRevenueMTD,
+        paymentCount: payments.length,
+        discountCount: discounts.length,
+        startDate: monthStart,
+        endDate: currentDate
+      }
+    });
+
+  } catch (error) {
+    console.error('Error calculating MTD metrics:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to calculate financial metrics'
     });
   }
 };

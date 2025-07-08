@@ -38,8 +38,8 @@ const MasterclassStudentTable = ({ cohort }) => {
       <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <SmartTooltip content={cohort.masterclassTitle}>
-            <h3 className="text-sm font-medium text-gray-900">
-              {truncateText(cohort.masterclassTitle)}
+            <h3 className="text-sm font-medium text-gray-900 truncate">
+              {truncateText(cohort.masterclassTitle, 15)}
             </h3>
           </SmartTooltip>
           <span className={`px-2 py-1 text-xs font-medium rounded border ${statusColors[status]}`}>

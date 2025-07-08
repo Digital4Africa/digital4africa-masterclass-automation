@@ -17,6 +17,11 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
   const currentDate = new Date();
   const startDate = new Date(cohort.startDate);
   const endDate = new Date(cohort.endDate);
+  const [endHours, endMinutes] = cohort.endTime.split(":").map(Number);
+  endDate.setHours(endHours);
+  endDate.setMinutes(endMinutes);
+  endDate.setSeconds(0);
+  endDate.setMilliseconds(0);
 
   const formatDate = (date) => {
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -69,7 +74,7 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
   const totalStudents = cohort.students?.length || 0;
   const totalRevenue = cohort.payments?.reduce((sum, payment) => sum + payment.amount, 0) || 0;
   const totalDiscounts = cohort.payments?.reduce((sum, payment) => sum + (payment.discount || 0), 0) || 0;
-  const isDisabled = statusInfo.status !== "upcoming";
+  const isDisabled = currentDate > endDate;
 
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200 h-full flex flex-col">
@@ -96,16 +101,14 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
           </div>
         </div>
         <div className="flex-grow"></div>
-
         <div className="flex items-center justify-between">
           <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusInfo.color}`}>
             {statusInfo.label}
           </span>
           <div className="text-sm text-gray-600">
-            {formatDate(startDate)} - {formatDate(endDate)}
+            {formatDate(startDate)} - {formatDate(new Date(cohort.endDate))}
           </div>
         </div>
-
         <div className="grid grid-cols-3 gap-4 text-center">
           <div className="p-2 bg-gray-50 rounded-lg">
             <div className="text-sm text-gray-500">Students</div>
@@ -120,7 +123,6 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
             <div className="font-bold text-sm">{totalDiscounts.toLocaleString()}</div>
           </div>
         </div>
-
         <div className="flex space-x-3 pt-2">
           <button
             onClick={() => onCopyLink(cohort._id)}
@@ -130,7 +132,7 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
                 : "btn-secondary"
             }`}
             disabled={isDisabled}
-            title={isDisabled ? "Link can only be copied for upcoming cohorts" : "Copy link"}
+            title={isDisabled ? "Link can only be copied before the cohort ends" : "Copy link"}
           >
             Copy Link
           </button>
@@ -142,7 +144,7 @@ const CohortCard = ({ cohort, onCopyLink, toast, closeToast }) => {
                 : "bg-green-600 text-white hover:bg-green-700"
             }`}
             disabled={isDisabled}
-            title={isDisabled ? "Discounts can only be given before the cohort starts" : "Give discount"}
+            title={isDisabled ? "Discounts can only be given before the cohort ends" : "Give discount"}
           >
             Give Discount
           </button>

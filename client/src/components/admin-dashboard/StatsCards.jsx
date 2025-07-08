@@ -1,26 +1,53 @@
 import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const StatsCards = () => {
   const { allCohorts, loading } = useSelector((state) => state.cohorts);
+  const [metrics, setMetrics] = useState({
+    totalRevenueMTD: 0,
+    totalDiscountsMTD: 0,
+    netRevenueMTD: 0,
+    loadingMetrics: true
+  });
 
+  // Fetch payment metrics from backend
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/api/v1/enrollment/payment-metrics`, {
+          withCredentials: true
+        });
+
+        console.log("Full API response:", response.data); // Debug log
+
+        // Correctly access the nested data object
+        setMetrics({
+          totalRevenueMTD: response.data.data.totalRevenueMTD || 0,
+          totalDiscountsMTD: response.data.data.totalDiscountsMTD || 0,
+          netRevenueMTD: response.data.data.netRevenueMTD || 0,
+          loadingMetrics: false
+        });
+      } catch (error) {
+        console.error("Error fetching payment metrics:", error);
+        setMetrics(prev => ({ ...prev, loadingMetrics: false }));
+      }
+    };
+
+    fetchMetrics();
+  }, []);
+
+  console.log("metrics", metrics)
 
   const cohorts = allCohorts || [];
-
-  console.log("cohorts", cohorts)
-
   const currentDate = new Date();
-  const currentMonth = currentDate.getMonth();
-  const currentYear = currentDate.getFullYear();
-  const monthStart = new Date(currentYear, currentMonth, 1);
 
   // Filter upcoming and ongoing cohorts
   const upcoming = cohorts.filter((cohort) => {
     const startDate = new Date(cohort.startDate);
     const [startHours, startMinutes] = cohort.startTime.split(':').map(Number);
-
-    // Set the start time on the start date
     startDate.setHours(startHours, startMinutes, 0, 0);
-
     return currentDate < startDate;
   }).length;
 
@@ -28,54 +55,11 @@ const StatsCards = () => {
     const startDate = new Date(cohort.startDate);
     const endDate = new Date(cohort.endDate);
     const [startHours, startMinutes] = cohort.startTime.split(':').map(Number);
-
-    // Set the start time on the start date
     startDate.setHours(startHours, startMinutes, 0, 0);
-
     return currentDate >= startDate && currentDate <= endDate;
   }).length;
 
   const totalActiveMasterclasses = upcoming + ongoing;
-
-  // Calculate total discounts MTD (sum of all discounts in payments array)
-  const totalDiscountsMTD = cohorts.reduce((total, cohort) => {
-    if (cohort.payments && cohort.payments.length > 0) {
-      const paymentsThisMonth = cohort.payments.filter((payment) => {
-        const paymentDate = new Date(cohort.createdAt); // Using cohort creation date as payment date
-        return paymentDate >= monthStart && paymentDate <= currentDate;
-      });
-      const cohortDiscount = paymentsThisMonth.reduce(
-        (sum, payment) => sum + (payment.discount || 0),
-        0
-      );
-      return total + cohortDiscount;
-    }
-    return total;
-  }, 0);
-
-  // Calculate total potential revenue (sum of all cohort prices)
-  const totalPotentialRevenue = cohorts.reduce(
-    (total, cohort) => total + cohort.masterclassPrice,
-    0
-  );
-
-  // Calculate net revenue MTD (sum of all payment amounts)
-  const totalRevenueMTD = cohorts.reduce((total, cohort) => {
-    if (cohort.payments && cohort.payments.length > 0) {
-      const paymentsThisMonth = cohort.payments.filter((payment) => {
-        const paymentDate = new Date(cohort.createdAt); // Using cohort creation date as payment date
-        return paymentDate >= monthStart && paymentDate <= currentDate;
-      });
-      const cohortRevenue = paymentsThisMonth.reduce(
-        (sum, payment) => sum + payment.amount,
-        0
-      );
-      return total + cohortRevenue;
-    }
-    return total;
-  }, 0);
-
-  const netRevenueMTD = totalRevenueMTD;
 
   // Loading spinner component
   const LoadingSpinner = () => (
@@ -99,18 +83,18 @@ const StatsCards = () => {
     },
     {
       title: "Total Discounts MTD",
-      value: loading ? (
+      value: metrics.loadingMetrics ? (
         <LoadingSpinner />
       ) : (
-        `Kes ${totalDiscountsMTD.toLocaleString()}`
+        `Kes ${metrics.totalDiscountsMTD.toLocaleString()}`
       ),
     },
     {
       title: "Net Revenue MTD",
-      value: loading ? (
+      value: metrics.loadingMetrics ? (
         <LoadingSpinner />
       ) : (
-        `Kes ${netRevenueMTD.toLocaleString()}`
+        `Kes ${metrics.netRevenueMTD.toLocaleString()}`
       ),
     },
   ];
